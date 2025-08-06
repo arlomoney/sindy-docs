@@ -1,7 +1,5 @@
 "use client";
 import React, { useState } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ChevronDown, ChevronRight, Play, Github, Book, Zap, Users, CheckCircle, Code, Terminal, Lightbulb, Star, ArrowRight, Youtube, ExternalLink, Target, BarChart3, Cpu } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -271,38 +269,22 @@ export default function HomePage() {
               </div>
             </div>
           <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
-            <div className="space-y-8">
-              <div className="bg-slate-900 rounded-xl overflow-hidden border border-slate-700">
-                <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
-                  <span className="text-green-400 font-mono text-sm flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                    <span className="ml-2">Basic Implementation Example</span>
-                  </span>
-                  <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
-                    Copy
-                  </button>
-                </div>
-                
-                <SyntaxHighlighter
-                  language="python"
-                  style={vscDarkPlus}
-                  customStyle={{
-                    margin: 0,
-                    padding: '1.5rem',
-                    background: 'rgb(15 23 42)', // slate-900
-                    fontSize: '0.875rem',
-                    lineHeight: '1.5'
-                  }}
-                  showLineNumbers={true}
-                  lineNumberStyle={{
-                    color: '#64748b',
-                    paddingRight: '1rem',
-                    minWidth: '3rem'
-                  }}
-                >
-        {`import numpy as np
+            <div className="space-y-8">                
+<div className="bg-slate-900 rounded-xl overflow-hidden border border-slate-700">
+  <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
+    <span className="text-green-400 font-mono text-sm flex items-center gap-2">
+      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+      <span className="ml-2">sindy_example.py</span>
+    </span>
+    <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
+      Copy
+    </button>
+  </div>
+  
+  <pre className="text-sm text-slate-300 overflow-x-auto p-6 bg-slate-900 font-mono leading-relaxed">
+    <code>{`import numpy as np
 from scipy.integrate import odeint
 from sklearn.linear_model import Lasso
 
@@ -340,11 +322,11 @@ model.fit(Theta, Xdot)
 print("Discovered equations:")
 for i, coef in enumerate(model.coef_):
     if abs(coef) > 1e-3:
-        print(f"dx{i}/dt = {coef:.3f} * feature_{i}")`}
-                </SyntaxHighlighter>
+        print(f"dx{i}/dt = {coef:.3f} * feature_{i}")`}</code>
+  </pre>
+</div>
               </div>
             </div>
-          </div>
           </section>
 
           {/* Video Resources Section */}
@@ -428,7 +410,7 @@ for i, coef in enumerate(model.coef_):
                     onClick={() => setSelectedDemo(demo.id)}
                     className={`px-4 py-2 rounded-lg font-medium transition-colors text-sm ${
                       selectedDemo === demo.id
-                        ? 'bg-blue-600 text-white shadow-lg'
+                        ? 'bg-slate-800 text-white shadow-lg'
                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                     }`}
                   >
@@ -752,6 +734,55 @@ for i, coef in enumerate(model.coef_):
                 </div>
               </div>
             </div>
+            {/*Contact Card*/}
+            {/* Add this section anywhere in your page */}
+{/* Add this section anywhere in your page */}
+<div className="space-y-4">
+  <h3 className="text-xl font-semibold text-slate-900">Contact</h3>
+  <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50">
+  <div className="flex items-center gap-6">
+    {/* Profile Image */}
+    <div className="w-16 h-16 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
+      <span className="text-white text-lg font-bold">SB</span>
+    </div>
+    
+    {/* Contact Info */}
+    <div className="flex-1">
+      <div className="flex items-start justify-between">
+        <div>
+          <h4 className="text-lg font-bold text-slate-900">Professor Steve Brunton</h4>
+          <p className="text-slate-600 text-sm mb-1">University of Washington</p>
+          <p className="text-slate-500 text-xs">Questions about SINDy theory and methodology</p>
+        </div>
+        
+        {/* Contact Links */}
+        <div className="flex gap-2 ml-4">
+          <a 
+            href="mailto:sbrunton@uw.edu" 
+            className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
+            title="Email Professor Brunton"
+          >
+            <svg className="w-4 h-4 text-slate-600 group-hover:text-slate-800" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+            </svg>
+          </a>
+          
+          <a 
+            href="https://github.com" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
+            title="GitHub Profile"
+          >
+            <Github className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>            
 
             {/* Community Links */}
             <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">

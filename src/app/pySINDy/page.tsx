@@ -1,7 +1,5 @@
 "use client"
 import React, { useState } from 'react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { ChevronDown, ChevronRight, Play, Download, Github, Book, Zap, Users, CheckCircle, AlertCircle, Code, Terminal, Lightbulb, Rocket, Star, ArrowRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -74,8 +72,8 @@ export default function PySINDyPage() {
                 <span>Python Implementation</span>
               </div>
               <h1 className="text-5xl font-bold text-slate-900 leading-tight">
-                Discover Hidden
-                <span className="bg-gradient-to-r from-slate-700 to-slate-800 bg-clip-text text-transparent"> Dynamics</span>
+                Build Models
+                <span className="bg-gradient-to-r from-slate-700 to-slate-800 bg-clip-text text-transparent"> From Data</span>
               </h1>
               <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
                 pySINDy is a comprehensive Python package for identifying governing equations from data using sparse regression techniques. 
@@ -243,39 +241,23 @@ export default function PySINDyPage() {
 
             <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
               <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-slate-900">Basic Usage Example</h3>
-                
-                <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
-                  <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
-                    <span className="text-slate-300 font-mono text-sm flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <span className="ml-2">lorenz_example.py</span>
-                    </span>
-                    <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
-                      Copy
-                    </button>
-                  </div>
+                <h3 className="text-xl font-semibold text-slate-900">Basic Usage Example</h3>                
                   
-                  <SyntaxHighlighter
-                    language="python"
-                    style={vscDarkPlus}
-                    customStyle={{
-                      margin: 0,
-                      padding: '1.5rem',
-                      background: 'rgb(15 23 42)', // slate-900
-                      fontSize: '0.875rem',
-                      lineHeight: '1.5'
-                    }}
-                    showLineNumbers={true}
-                    lineNumberStyle={{
-                      color: '#64748b',
-                      paddingRight: '1rem',
-                      minWidth: '3rem'
-                    }}
-                  >
-        {`import numpy as np
+                  <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
+                    <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
+                      <span className="text-slate-300 font-mono text-sm flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                        <span className="ml-2">lorenz_example.py</span>
+                      </span>
+                      <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
+                        Copy
+                      </button>
+                    </div>
+                    
+                    <pre className="text-sm text-slate-300 overflow-x-auto p-6 bg-slate-900 font-mono leading-relaxed">
+    <code>{`import numpy as np
 import matplotlib.pyplot as plt
 from pysindy import SINDy
 
@@ -310,8 +292,9 @@ plt.plot(t_train, x_test[:, 0], 'r--', label='SINDy')
 plt.xlabel('Time')
 plt.ylabel('x')
 plt.legend()
-plt.show()`}
-                  </SyntaxHighlighter>
+plt.show()`}</code>
+                    </pre>
+                  </div>
                 </div>
               </div>
                 <div className="mt-12 grid md:grid-cols-2 gap-8">
@@ -341,7 +324,6 @@ plt.show()`}
                     </div>
                   </div>
                 </div>
-              </div>
           </section>
 
           {/* Tutorials Section */}
@@ -577,7 +559,54 @@ plt.show()`}
                 </div>
               </div>
             </div>
-
+          {/*Contact Card*/}
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold text-slate-900">Contact</h3>
+            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50">
+            <div className="flex items-center gap-6">
+              {/* Profile Image */}
+              <div className="w-16 h-16 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
+                <span className="text-white text-lg font-bold">AL</span>
+              </div>
+              
+              {/* Contact Info */}
+              <div className="flex-1">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h4 className="text-lg font-bold text-slate-900">Dr. Ana Larranaga</h4>
+                    <p className="text-slate-600 text-sm mb-1">University of Washington</p>
+                    <p className="text-slate-500 text-xs">Questions about pySINDy implementation and issues</p>
+                  </div>
+                  
+                  {/* Contact Links */}
+                  <div className="flex gap-2 ml-4">
+                    <a 
+                      href="mailto:alarranaga@uw.edu" 
+                      className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
+                      title="Email Dr. Larranaga"
+                    >
+                      <svg className="w-4 h-4 text-slate-600 group-hover:text-slate-800" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                      </svg>
+                    </a>
+                    
+                    <a 
+                      href="https://github.com" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
+                      title="GitHub Profile"
+                    >
+                      <Github className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>            
+          
             {/* FAQ Section */}
             <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
               <h3 className="text-xl font-semibold text-slate-900 mb-6">Frequently Asked Questions</h3>
