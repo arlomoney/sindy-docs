@@ -9,11 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@types/react-syntax-highlighter": "^15.5.13",
     "clsx": "^2.1.1",
     "lucide-react": "^0.536.0",
     "next": "15.4.5",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-syntax-highlighter": "^15.6.1",
     "tailwind-animate": "^0.2.10",
     "tailwind-merge": "^3.3.1",
     "tailwind-scrollbar": "^4.0.2",

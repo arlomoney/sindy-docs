@@ -14,8 +14,8 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage = 'home' }) => {
   // Navigation items for different implementation pages
   const navItems = [
     { id: 'home', label: 'Home', icon: Home, href: '/' },
-    { id: 'pysindy', label: 'PySINDy', icon: Code, href: 'pySINDy' },
-    { id: 'matlab', label: 'MATLAB', icon: Terminal, href: '/MATLAB' },
+    { id: 'pysindy', label: 'PySINDy', icon: Code, href: '/pysindy' },
+    { id: 'matlab', label: 'MATLAB', icon: Terminal, href: '/matlab' },
     { id: 'julia', label: 'Julia', icon: Rocket, href: '/julia' },
     { id: 'cpp', label: 'C++', icon: FileCode, href: '' },
     { id: 'engineers', label: 'For Engineers', icon: Users, href: '/engineers' },
@@ -47,11 +47,11 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage = 'home' }) => {
               <Link
                 key={item.id}
                 href={item.href}
-                className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-3 rounded-lg transition-all group relative ${
-                  isActive
-                    ? 'bg-blue-100 text-blue-700 font-medium shadow-sm'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
-                }`}
+className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center px-2' : 'space-x-3 px-3'} py-3 rounded-lg transition-all group relative ${
+  isActive
+    ? 'bg-slate-700 text-white font-medium shadow-sm'
+    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+}`}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
                 {!sidebarCollapsed && <span className="text-sm font-medium">{item.label}</span>}
@@ -61,7 +61,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage = 'home' }) => {
                   </div>
                 )}
                 {isActive && !sidebarCollapsed && (
-                  <div className="w-2 h-2 bg-blue-600 rounded-full ml-auto"></div>
+                  <div className="w-2 h-2 bg-white rounded-full ml-auto"></div>
                 )}
               </Link>
             );

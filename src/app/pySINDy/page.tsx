@@ -1,5 +1,7 @@
 "use client"
 import React, { useState } from 'react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import { ChevronDown, ChevronRight, Play, Download, Github, Book, Zap, Users, CheckCircle, AlertCircle, Code, Terminal, Lightbulb, Rocket, Star, ArrowRight } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -53,9 +55,6 @@ export default function PySINDyPage() {
                 <Github className="w-4 h-4" />
                 <span>GitHub</span>
               </a>
-              <button className="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                Install Now
-              </button>
             </div>
           </div>
         </div>
@@ -142,19 +141,19 @@ export default function PySINDyPage() {
                 <div className="space-y-4">
                   <h4 className="font-semibold text-slate-900">Required Dependencies</h4>
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 text-slate-900 rounded-lg">
                       <span className="font-mono text-sm">Python</span>
                       <span className="text-sm text-slate-600">≥ 3.7</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 text-slate-900 rounded-lg">
                       <span className="font-mono text-sm">NumPy</span>
                       <span className="text-sm text-slate-600">≥ 1.16</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 text-slate-900 rounded-lg">
                       <span className="font-mono text-sm">SciPy</span>
                       <span className="text-sm text-slate-600">≥ 1.0.0</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 text-slate-900 rounded-lg">
                       <span className="font-mono text-sm">scikit-learn</span>
                       <span className="text-sm text-slate-600">≥ 1.0</span>
                     </div>
@@ -164,15 +163,15 @@ export default function PySINDyPage() {
                 <div className="space-y-4">
                   <h4 className="font-semibold text-slate-900">Optional Dependencies</h4>
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 text-slate-900 rounded-lg">
                       <span className="font-mono text-sm">matplotlib</span>
                       <span className="text-sm text-slate-600">plotting</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 text-slate-900 rounded-lg">
                       <span className="font-mono text-sm">gurobipy</span>
                       <span className="text-sm text-slate-600">MIOSR optimizer</span>
                     </div>
-                    <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-center justify-between p-3 text-slate-900 rounded-lg">
                       <span className="font-mono text-sm">cvxpy</span>
                       <span className="text-sm text-slate-600">convex optimization</span>
                     </div>
@@ -246,10 +245,37 @@ export default function PySINDyPage() {
               <div className="space-y-6">
                 <h3 className="text-xl font-semibold text-slate-900">Basic Usage Example</h3>
                 
-                <div className="bg-slate-900 rounded-lg p-6 overflow-x-auto">
-                  <pre className="text-sm">
-                    <code className="text-slate-300">
-{`import numpy as np
+                <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
+                  <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
+                    <span className="text-slate-300 font-mono text-sm flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span className="ml-2">lorenz_example.py</span>
+                    </span>
+                    <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
+                      Copy
+                    </button>
+                  </div>
+                  
+                  <SyntaxHighlighter
+                    language="python"
+                    style={vscDarkPlus}
+                    customStyle={{
+                      margin: 0,
+                      padding: '1.5rem',
+                      background: 'rgb(15 23 42)', // slate-900
+                      fontSize: '0.875rem',
+                      lineHeight: '1.5'
+                    }}
+                    showLineNumbers={true}
+                    lineNumberStyle={{
+                      color: '#64748b',
+                      paddingRight: '1rem',
+                      minWidth: '3rem'
+                    }}
+                  >
+        {`import numpy as np
 import matplotlib.pyplot as plt
 from pysindy import SINDy
 
@@ -285,11 +311,10 @@ plt.xlabel('Time')
 plt.ylabel('x')
 plt.legend()
 plt.show()`}
-                    </code>
-                  </pre>
+                  </SyntaxHighlighter>
                 </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
+              </div>
+                <div className="mt-12 grid md:grid-cols-2 gap-8">
                   <div className="space-y-3">
                     <h4 className="font-semibold text-slate-900">What this code does:</h4>
                     <ul className="space-y-2 text-sm text-slate-600">
@@ -309,7 +334,7 @@ plt.show()`}
                   </div>
                   <div className="space-y-3">
                     <h4 className="font-semibold text-slate-900">Expected output:</h4>
-                    <div className="bg-slate-50 p-3 rounded-lg font-mono text-sm">
+                    <div className="text-slate-600 p-3 rounded-lg font-mono text-sm">
                       <div>x' = -10.000 x + 10.000 y</div>
                       <div>y' = 27.994 x - 0.999 y - 1.000 x z</div>
                       <div>z' = -2.666 z + 1.000 x y</div>
@@ -317,7 +342,6 @@ plt.show()`}
                   </div>
                 </div>
               </div>
-            </div>
           </section>
 
           {/* Tutorials Section */}

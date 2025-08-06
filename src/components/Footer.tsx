@@ -10,7 +10,7 @@ const Footer = () => {
           {/* Brand Section */}
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg flex items-center justify-center">
                 <Zap className="h-6 w-6 text-white" />
               </div>
               <div>

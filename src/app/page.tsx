@@ -1,5 +1,7 @@
 "use client";
 import React, { useState } from 'react';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ChevronDown, ChevronRight, Play, Github, Book, Zap, Users, CheckCircle, Code, Terminal, Lightbulb, Star, ArrowRight, Youtube, ExternalLink, Target, BarChart3, Cpu } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -7,7 +9,7 @@ import Footer from '@/components/Footer';
 export default function HomePage() {
   const [expandedFAQ, setExpandedFAQ] = useState(null);
   const [selectedDemo, setSelectedDemo] = useState('lorenz');
-
+  
   const demoOptions = [
     { id: 'lorenz', name: 'Lorenz System', description: 'Famous chaotic attractor' },
     { id: 'vanderpol', name: 'Van der Pol', description: 'Nonlinear oscillator' },
@@ -193,10 +195,10 @@ export default function HomePage() {
                   <h3 className="text-xl font-semibold text-slate-900 mb-6 text-center">How SINDy Works</h3>
                   <div className="space-y-4">
                     {[
-                      { step: "01", title: "Collect Data", desc: "Gather time-series measurements X(t)" },
-                      { step: "02", title: "Compute Derivatives", desc: "Calculate Ẋ using numerical methods" },
-                      { step: "03", title: "Build Library", desc: "Construct candidate functions Θ(X)" },
-                      { step: "04", title: "Sparse Regression", desc: "Solve Ẋ = Θ(X)Ξ with sparsity constraints" }
+                      { step: "1", title: "Collect Data", desc: "Gather time-series measurements X(t)" },
+                      { step: "2", title: "Compute Derivatives", desc: "Calculate Ẋ using numerical methods" },
+                      { step: "3", title: "Build Library", desc: "Construct candidate functions Θ(X)" },
+                      { step: "4", title: "Sparse Regression", desc: "Solve Ẋ = Θ(X)Ξ with sparsity constraints" }
                     ].map((item, index) => (
                       <div key={index} className="flex items-center gap-4 group">
                         <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 text-white rounded-lg flex items-center justify-center font-bold text-sm group-hover:scale-110 transition-transform">
@@ -245,6 +247,11 @@ export default function HomePage() {
                     icon: CheckCircle,
                     title: "Model Validation",
                     items: ["Stability analysis", "Prediction accuracy", "Robustness testing", "Physical consistency"]
+                  },
+                  {
+                    icon: Book,
+                    title: "Advanced Topics",
+                    items: ["PDE discovery", "Nonlinear control", "Hybrid systems", "Multiscale modeling"]
                   }
                 ].map((item, index) => (
                   <div key={index} className="bg-slate-50 rounded-xl p-6 border border-slate-200 hover:shadow-lg transition-shadow">
@@ -254,8 +261,7 @@ export default function HomePage() {
                     <h3 className="text-lg font-bold text-slate-900 mb-3">{item.title}</h3>
                     <ul className="space-y-2">
                       {item.items.map((listItem, idx) => (
-                        <li key={idx} className="flex items-center gap-2 text-slate-600 text-sm">
-                          <div className="w-1.5 h-1.5 bg-slate-600 rounded-full"></div>
+                        <li key={`${index}-${idx}`} className="flex items-center gap-2 text-slate-600 text-sm">                          <div className="w-1.5 h-1.5 bg-slate-600 rounded-full"></div>
                           <span>{listItem}</span>
                         </li>
                       ))}
@@ -263,17 +269,40 @@ export default function HomePage() {
                   </div>
                 ))}
               </div>
-              
-              <div className="bg-slate-900 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
+            </div>
+          <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
+            <div className="space-y-8">
+              <div className="bg-slate-900 rounded-xl overflow-hidden border border-slate-700">
+                <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
                   <span className="text-green-400 font-mono text-sm flex items-center gap-2">
-                    <Terminal className="w-4 h-4" />
-                    Basic Implementation Example
+                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                    <span className="ml-2">Basic Implementation Example</span>
                   </span>
-                  <button className="text-slate-400 hover:text-white text-xs">Copy</button>
+                  <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
+                    Copy
+                  </button>
                 </div>
-                <pre className="text-sm text-slate-300 overflow-x-auto">
-                  <code>{`import numpy as np
+                
+                <SyntaxHighlighter
+                  language="python"
+                  style={vscDarkPlus}
+                  customStyle={{
+                    margin: 0,
+                    padding: '1.5rem',
+                    background: 'rgb(15 23 42)', // slate-900
+                    fontSize: '0.875rem',
+                    lineHeight: '1.5'
+                  }}
+                  showLineNumbers={true}
+                  lineNumberStyle={{
+                    color: '#64748b',
+                    paddingRight: '1rem',
+                    minWidth: '3rem'
+                  }}
+                >
+        {`import numpy as np
 from scipy.integrate import odeint
 from sklearn.linear_model import Lasso
 
@@ -311,10 +340,11 @@ model.fit(Theta, Xdot)
 print("Discovered equations:")
 for i, coef in enumerate(model.coef_):
     if abs(coef) > 1e-3:
-        print(f"dx{i}/dt = {coef:.3f} * feature_{i}")`}</code>
-                </pre>
+        print(f"dx{i}/dt = {coef:.3f} * feature_{i}")`}
+                </SyntaxHighlighter>
               </div>
             </div>
+          </div>
           </section>
 
           {/* Video Resources Section */}
@@ -347,7 +377,7 @@ for i, coef in enumerate(model.coef_):
                   url: "https://www.youtube.com/watch?v=NxAn0oglMVw&list=PLq7sjSxACEo6iRtnbLShncBn-alTQb1GS"
                 }
               ].map((video, index) => (
-                <a 
+                <a key = {index}
                   href={video.url}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -394,8 +424,7 @@ for i, coef in enumerate(model.coef_):
             <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
               <div className="flex flex-wrap gap-3 mb-6">
                 {demoOptions.map((demo) => (
-                  <button
-                    key={demo.id}
+                  <button key={demo.id}
                     onClick={() => setSelectedDemo(demo.id)}
                     className={`px-4 py-2 rounded-lg font-medium transition-colors text-sm ${
                       selectedDemo === demo.id
@@ -449,7 +478,7 @@ for i, coef in enumerate(model.coef_):
                         <>
                           <div>dx/dt = -10.000 x + 10.000 y</div>
                           <div>dy/dt = 27.994 x - 0.999 y - 1.000 x z</div>
-                          <div>dz/dt = -2.666 z A+ 1.000 x y</div>
+                          <div>dz/dt = -2.666 z + 1.000 x y</div>
                         </>
                       )}
                       {selectedDemo === 'vanderpol' && (
@@ -661,7 +690,7 @@ for i, coef in enumerate(model.coef_):
             <div className="grid lg:grid-cols-2 gap-8">
               <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
                 <h3 className="text-xl font-semibold text-slate-900 mb-6">How to Contribute</h3>
-                <div className="space-y-6">
+                <div className="space-y-7">
                   <div className="flex items-start gap-4">
                     <div className="bg-blue-100 rounded-xl p-3 flex-shrink-0">
                       <Code className="h-6 w-6 text-blue-600" />
@@ -703,9 +732,9 @@ for i, coef in enumerate(model.coef_):
                 </div>
               </div>
               
-              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
+              <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/50">
                 <h3 className="text-xl font-semibold text-slate-900 mb-6">Contribution Guidelines</h3>
-                <div className="space-y-4 mb-8">
+                <div className="space-y-6 mb-8">
                   {[
                     "Follow established code style and documentation standards",
                     "Include comprehensive tests and validation examples", 
@@ -713,22 +742,13 @@ for i, coef in enumerate(model.coef_):
                     "Submit through GitHub with detailed pull request descriptions",
                     "Engage with the community through discussions and reviews"
                   ].map((guideline, index) => (
-                    <div key={index} className="flex items-start gap-3">
-                      <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <span className="text-white text-xs font-bold">{index + 1}</span>
+                    <div key={index} className="flex items-start gap-4 group hover:bg-slate-50/50 p-3 rounded-lg transition-all duration-200">
+                      <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-800 rounded-lg flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-105 transition-transform duration-200">
+                        <span className="text-white text-sm font-bold">{index + 1}</span>
                       </div>
-                      <p className="text-slate-600 leading-relaxed text-sm">{guideline}</p>
+                      <p className="text-slate-700 leading-relaxed text-base pt-1 group-hover:text-slate-800 transition-colors">{guideline}</p>
                     </div>
                   ))}
-                </div>
-                
-                <div className="space-y-3">
-                  <button className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors shadow-lg hover:shadow-xl">
-                    Start Contributing
-                  </button>
-                  <button className="w-full border border-slate-300 hover:border-slate-400 text-slate-700 px-6 py-3 rounded-lg font-semibold hover:bg-slate-50 transition-colors">
-                    Join Discussions
-                  </button>
                 </div>
               </div>
             </div>
