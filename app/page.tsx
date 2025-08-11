@@ -53,11 +53,6 @@ export default function HomePage() {
                 <p className="text-xs text-slate-600">Sparse Identification of Nonlinear Dynamics</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <button className="bg-slate-700 hover:bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                Get Started
-              </button>
-            </div>
           </div>
         </div>
       </header>
@@ -83,6 +78,30 @@ export default function HomePage() {
                 SINDy is a revolutionary approach for identifying governing equations from data using sparse regression techniques. 
                 Perfect for scientists, engineers, and researchers working with complex dynamical systems.
               </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50 hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 bg-slate-100 rounded-lg flex items-center justify-center mb-4">
+                  <Zap className="w-6 h-6 text-slate-700" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">Sparse Discovery</h3>
+                <p className="text-slate-600">Advanced sparse regression methods like LASSO and STLSQ automatically identify the most relevant terms in governing equations.</p>
+              </div>
+              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50 hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
+                  <BarChart3 className="w-6 h-6 text-green-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">Data-Driven</h3>
+                <p className="text-slate-600">Discovers equations directly from time-series measurements without requiring prior knowledge of system structure.</p>
+              </div>
+              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50 hover:shadow-lg transition-shadow">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                  <Code className="w-6 h-6 text-purple-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-2">Interpretable</h3>
+                <p className="text-slate-600">Produces clean, human-readable mathematical equations that can be directly interpreted and validated.</p>
+              </div>
             </div>
           </section>
 
