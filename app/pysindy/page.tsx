@@ -286,8 +286,7 @@ plt.show()`}</code>
                     </pre>
                   </div>
                 </div>
-              </div>
-                <div className="mt-12 grid md:grid-cols-2 gap-8">
+                                <div className="mt-12 grid md:grid-cols-2 gap-8">
                   <div className="space-y-3">
                     <h4 className="font-semibold text-slate-900">What this code does:</h4>
                     <ul className="space-y-2 text-sm text-slate-600">
@@ -305,6 +304,7 @@ plt.show()`}</code>
                       </li>
                     </ul>
                   </div>
+              </div>
                   <div className="space-y-3">
                     <h4 className="font-semibold text-slate-900">Expected output:</h4>
                     <div className="text-slate-600 p-3 rounded-lg font-mono text-sm">
