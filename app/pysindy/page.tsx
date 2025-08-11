@@ -176,18 +176,18 @@ export default function PySINDyPage() {
                 <div className="space-y-4">
                   <div className="bg-slate-900 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-green-400 font-mono text-sm">pip install (recommended)</span>
+                      <span className="text-green-400 font-mono text-sm">conda install (recommended)</span>
                       <button className="text-slate-400 hover:text-white text-xs">Copy</button>
                     </div>
-                    <code className="text-green-400 font-mono">pip install pysindy</code>
+                    <code className="text-green-400 font-mono">conda install -c conda-forge pysindy</code>
                   </div>
                   
                   <div className="bg-slate-900 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-blue-400 font-mono text-sm">conda install</span>
+                      <span className="text-blue-400 font-mono text-sm">pip install</span>
                       <button className="text-slate-400 hover:text-white text-xs">Copy</button>
                     </div>
-                    <code className="text-blue-400 font-mono">conda install -c conda-forge pysindy</code>
+                    <code className="text-blue-400 font-mono">pip install pysindy</code>
                   </div>
                   
                   <div className="bg-slate-900 rounded-lg p-4">
