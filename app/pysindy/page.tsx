@@ -79,16 +79,6 @@ export default function PySINDyPage() {
                 pySINDy is a comprehensive Python package for identifying governing equations from data using sparse regression techniques. 
                 Perfect for scientists, engineers, and researchers working with dynamical systems.
               </p>
-              <div className="flex items-center justify-center space-x-4">
-                <button className="bg-slate-700 hover:bg-slate-800 text-white px-6 py-3 rounded-lg font-medium flex items-center space-x-2 transition-colors shadow-lg hover:shadow-xl">
-                  <Download className="w-4 h-4" />
-                  <span>Install Now</span>
-                </button>
-                <button className="border border-slate-300 hover:border-slate-400 text-slate-700 px-6 py-3 rounded-lg font-medium flex items-center space-x-2 transition-colors">
-                  <Play className="w-4 h-4" />
-                  <span>Try Demo</span>
-                </button>
-              </div>
             </div>
 
             <div className="grid md:grid-cols-3 gap-6">
