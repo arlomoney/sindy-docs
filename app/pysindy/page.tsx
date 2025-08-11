@@ -316,6 +316,7 @@ plt.show()`}</code>
                     </div>
                   </div>
                 </div>
+              </div>
           </section>
 
           {/* Tutorials Section */}
