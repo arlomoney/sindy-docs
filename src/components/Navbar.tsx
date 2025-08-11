@@ -15,9 +15,9 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage = 'home' }) => {
   const navItems = [
     { id: 'home', label: 'Home', icon: Home, href: '/' },
     { id: 'pysindy', label: 'PySINDy', icon: Code, href: '/pysindy' },
-    { id: 'matlab', label: 'MATLAB', icon: Terminal, href: '/matlab' },
-    { id: 'julia', label: 'Julia', icon: Rocket, href: '/julia' },
-    { id: 'cpp', label: 'C++', icon: FileCode, href: '' },
+    { id: 'ensemble', label: 'MATLAB', icon: Terminal, href: '/ensemble' },
+    { id: 'weak', label: 'Julia', icon: Rocket, href: '/weak' },
+    { id: 'research', label: 'C++', icon: FileCode, href: '/research' },
     { id: 'engineers', label: 'For Engineers', icon: Users, href: '/engineers' },
   ];
 

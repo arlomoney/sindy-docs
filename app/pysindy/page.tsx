@@ -574,7 +574,7 @@ plt.show()`}</code>
                   {/* Contact Links */}
                   <div className="flex gap-2 ml-4">
                     <a 
-                      href="mailto:alarranaga@uw.edu" 
+                      href="mailto:alarra@uw.edu" 
                       className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
                       title="Email Dr. Larranaga"
                     >
