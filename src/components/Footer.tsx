@@ -62,21 +62,21 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/matlab" className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2">
+                <Link href="/ensemble" className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2">
                   <Code className="w-4 h-4" />
-                  MATLAB
+                  Ensemble SINDy
                 </Link>
               </li>
               <li>
-                <Link href="/julia" className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2">
+                <Link href="/weak" className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2">
                   <Code className="w-4 h-4" />
-                  Julia
+                  Weak SINDy
                 </Link>
               </li>
               <li>
-                <Link href="/cpp" className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2">
+                <Link href="/research" className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2">
                   <Code className="w-4 h-4" />
-                  C++
+                  Research
                 </Link>
               </li>
               <li>

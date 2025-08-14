@@ -1,12 +1,13 @@
 "use client"
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, Play, Download, Github, Book, Zap, Users, CheckCircle, AlertCircle, Code, Terminal, Lightbulb, Rocket, Star, ArrowRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, Play, Download, Github, Book, Zap, Users, CheckCircle, AlertCircle, Code, Terminal, Lightbulb, Rocket, Star, ArrowRight, X, AlertTriangle, ExternalLink } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 export default function PySINDyPage() {
   const [expandedFAQ, setExpandedFAQ] = useState(null);
   const [selectedDemo, setSelectedDemo] = useState('lorenz');
+  const [showDisclaimer, setShowDisclaimer] = useState(true);
 
   const demoOptions = [
     { id: 'lorenz', name: 'Lorenz System', description: 'Classic chaotic attractor' },
@@ -57,6 +58,36 @@ export default function PySINDyPage() {
           </div>
         </div>
       </header>
+
+      {/* Version Disclaimer Banner */}
+      {showDisclaimer && (
+        <div className="bg-amber-50 border-b border-amber-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="py-3 flex items-center justify-between">
+              <div className="flex items-start space-x-3 flex-1">
+                <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm">
+                  <p className="text-amber-900 font-medium">
+                    Tutorial Compatibility Notice
+                  </p>
+                  <p className="text-amber-800 mt-1">
+                    To follow along with the current tutorials, please install pySINDy version 1.7.5 (stable release). 
+                    The latest version (2.0+) includes breaking changes that are not yet reflected in all documentation.
+                    <span className="font-mono bg-amber-100 px-2 py-0.5 rounded ml-2">pip install pysindy==1.7.5</span>
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowDisclaimer(false)}
+                className="ml-4 p-1 hover:bg-amber-100 rounded transition-colors"
+                aria-label="Dismiss"
+              >
+                <X className="w-5 h-5 text-amber-600" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="flex max-w-7xl mx-auto">
         {/* Sidebar Navigation */}
@@ -119,6 +150,46 @@ export default function PySINDyPage() {
               </p>
             </div>
 
+            {/* Version Information Card */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+              <div className="flex items-start space-x-3">
+                <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+                <div className="flex-1">
+                  <h3 className="font-semibold text-blue-900 mb-2">Version Information</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-blue-800">Latest Release:</span>
+                      <span className="font-mono bg-blue-100 px-2 py-0.5 rounded">v2.0.0</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-blue-800">Stable (Tutorial-compatible):</span>
+                      <span className="font-mono bg-green-100 text-green-800 px-2 py-0.5 rounded">v1.7.5</span>
+                    </div>
+                    <p className="text-blue-700 mt-2">
+                      Note: Version 2.0+ includes breaking changes. For tutorial compatibility, use v1.7.5.
+                    </p>
+                    <div className="flex gap-2 mt-3">
+                      <a href="https://github.com/dynamicslab/pysindy/releases" 
+                         target="_blank" 
+                         rel="noopener noreferrer"
+                         className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium">
+                        View all releases
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                      <span className="text-blue-400">•</span>
+                      <a href="https://github.com/dynamicslab/pysindy/blob/master/CHANGELOG.md" 
+                         target="_blank" 
+                         rel="noopener noreferrer"
+                         className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium">
+                        Changelog
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
               <h3 className="text-xl font-semibold text-slate-900 mb-6 flex items-center space-x-2">
                 <CheckCircle className="w-5 h-5 text-green-600" />
@@ -176,23 +247,31 @@ export default function PySINDyPage() {
                 <div className="space-y-4">
                   <div className="bg-slate-900 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-green-400 font-mono text-sm">conda install (recommended)</span>
+                      <span className="text-yellow-400 font-mono text-sm">Conda install (reccomended)</span>
                       <button className="text-slate-400 hover:text-white text-xs">Copy</button>
                     </div>
-                    <code className="text-green-400 font-mono">conda install -c conda-forge pysindy</code>
+                    <code className="text-yellow-400 font-mono">conda install -c conda-forge pysindy</code>
                   </div>
-                  
+
                   <div className="bg-slate-900 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-blue-400 font-mono text-sm">pip install</span>
+                      <span className="text-green-400 font-mono text-sm">Install stable version (recommended for tutorials)</span>
+                      <button className="text-slate-400 hover:text-white text-xs">Copy</button>
+                    </div>
+                    <code className="text-green-400 font-mono">pip install pysindy==1.7.5</code>
+                  </div>
+
+                  <div className="bg-slate-900 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-blue-400 font-mono text-sm">Install latest version</span>
                       <button className="text-slate-400 hover:text-white text-xs">Copy</button>
                     </div>
                     <code className="text-blue-400 font-mono">pip install pysindy</code>
                   </div>
-                  
+                                    
                   <div className="bg-slate-900 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-purple-400 font-mono text-sm">development version</span>
+                      <span className="text-purple-400 font-mono text-sm">Development version</span>
                       <button className="text-slate-400 hover:text-white text-xs">Copy</button>
                     </div>
                     <code className="text-purple-400 font-mono text-sm">
@@ -487,6 +566,141 @@ plt.show()`}</code>
             </div>
           </section>
 
+                    {/* FAQ Section */}
+                    <section className="space-y-8">
+                      <div className="text-center space-y-4">
+                        <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-sm font-medium">
+                          <Lightbulb className="h-4 w-4" />
+                          FAQ
+                        </div>
+                        <h2 className="text-4xl font-bold text-slate-900">Frequently Asked Questions</h2>
+                        <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
+                          Common questions about PySINDy
+                        </p>
+                      </div>
+          
+                      <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
+                        <div className="space-y-4">
+                          {faqItems.map((faq, index) => (
+                            <div key={index} className="border border-slate-200 rounded-lg bg-white/50">
+                              <button
+                                onClick={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
+                                className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-50/50 transition-colors rounded-lg"
+                              >
+                                <span className="font-medium text-slate-900 pr-4">{faq.q}</span>
+                                {expandedFAQ === index ? (
+                                  <ChevronDown className="w-4 h-4 text-slate-600 flex-shrink-0" />
+                                ) : (
+                                  <ChevronRight className="w-4 h-4 text-slate-600 flex-shrink-0" />
+                                )}
+                              </button>
+                              {expandedFAQ === index && (
+                                <div className="px-4 pb-4">
+                                  <p className="text-slate-600 text-sm leading-relaxed">{faq.a}</p>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </section>
+
+          {/* Contact Section */}
+          <section id="contact" className="space-y-8">
+            {/* Contact Card - Jake */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-slate-900">Contact</h3>
+              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50">
+                <div className="flex items-center gap-6">
+                  {/* Profile Image */}
+                  <div className="w-16 h-16 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
+                    <span className="text-white text-lg font-bold">JS</span>
+                  </div>
+
+                  {/* Contact Info */}
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="text-lg font-bold text-slate-900">Dr. Jake Stevens-Haas</h4>
+                        <p className="text-slate-600 text-sm mb-1">University of Washington</p>
+                        <p className="text-slate-500 text-xs">Questions about PySINDy implementation and issues</p>
+                      </div>
+
+                      {/* Contact Links */}
+                      <div className="flex gap-2 ml-4">
+                        <a 
+                          href="mailto:jacob.stevens.haas@gmail.com" 
+                          className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
+                          title="Email Dr. Jacob"
+                        >
+                          <svg className="w-4 h-4 text-slate-600 group-hover:text-slate-800" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                          </svg>
+                        </a>
+                        <a 
+                          href="https://github.com" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
+                          title="GitHub Profile"
+                        >
+                          <Github className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Card - Yash */}
+            <div className="space-y-2">
+              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50">
+                <div className="flex items-center gap-6">
+                  {/* Profile Image */}
+                  <div className="w-16 h-16 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
+                    <span className="text-white text-lg font-bold">YB</span>
+                  </div>
+
+                  {/* Contact Info */}
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="text-lg font-bold text-slate-900">Yash S. Bhangale</h4>
+                        <p className="text-slate-600 text-sm mb-1">University of Washington</p>
+                        <p className="text-slate-500 text-xs">Questions about the PySINDy package and releases</p>
+                      </div>
+
+                      {/* Contact Links */}
+                      <div className="flex gap-2 ml-4">
+                        <a 
+                          href="mailto:yash6599@uw.edu" 
+                          className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
+                          title="Email Yash"
+                        >
+                          <svg className="w-4 h-4 text-slate-600 group-hover:text-slate-800" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                          </svg>
+                        </a>
+                        <a 
+                          href="https://github.com" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
+                          title="GitHub Profile"
+                        >
+                          <Github className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* Community Section */}
           <section id="community" className="space-y-8">
             <div className="text-center space-y-4">
@@ -504,21 +718,36 @@ plt.show()`}</code>
               <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
                 <h3 className="text-xl font-semibold text-slate-900 mb-6">Get Help</h3>
                 <div className="space-y-4">
-                  <a href="https://github.com/dynamicslab/pysindy/issues" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors">
+                  <a
+                    href="https://github.com/dynamicslab/pysindy/issues"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
+                  >
                     <Github className="w-5 h-5 text-slate-600" />
                     <div>
                       <div className="font-medium text-slate-900">GitHub Issues</div>
                       <div className="text-sm text-slate-600">Bug reports and feature requests</div>
                     </div>
                   </a>
-                  <a href="https://github.com/dynamicslab/pysindy/discussions" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors">
+                  <a
+                    href="https://github.com/dynamicslab/pysindy/discussions"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
+                  >
                     <Users className="w-5 h-5 text-slate-600" />
                     <div>
                       <div className="font-medium text-slate-900">Discussions</div>
-                      <div className="text-sm text-slate-600">Community Q&A and discussions</div>
+                      <div className="text-sm text-slate-600">Community Q&amp;A and discussions</div>
                     </div>
                   </a>
-                  <a href="https://stackoverflow.com/questions/tagged/pysindy" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors">
+                  <a
+                    href="https://stackoverflow.com/questions/tagged/pysindy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center space-x-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
+                  >
                     <Book className="w-5 h-5 text-slate-600" />
                     <div>
                       <div className="font-medium text-slate-900">Stack Overflow</div>
@@ -536,7 +765,12 @@ plt.show()`}</code>
                     <p className="text-sm text-slate-600 mb-3">
                       Help improve pySINDy by contributing code, documentation, or examples.
                     </p>
-                    <a href="https://opensource.guide/" target="_blank" rel="noopener noreferrer" className="text-slate-700 hover:text-slate-800 text-sm font-medium">
+                    <a
+                      href="https://opensource.guide/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-slate-700 hover:text-slate-800 text-sm font-medium"
+                    >
                       Contributing Guide →
                     </a>
                   </div>
@@ -545,94 +779,23 @@ plt.show()`}</code>
                     <p className="text-sm text-slate-600 mb-3">
                       Share your research applications and case studies with the community.
                     </p>
-                    <a href="mailto:contact@sindy.org" className="text-slate-700 hover:text-slate-800 text-sm font-medium">
+                    <a
+                      href="mailto:contact@sindy.org"
+                      className="text-slate-700 hover:text-slate-800 text-sm font-medium"
+                    >
                       Submit Example →
                     </a>
                   </div>
                 </div>
               </div>
             </div>
-          {/*Contact Card*/}
-          <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-slate-900">Contact</h3>
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50">
-            <div className="flex items-center gap-6">
-              {/* Profile Image */}
-              <div className="w-16 h-16 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
-                <span className="text-white text-lg font-bold">AL</span>
-              </div>
-              
-              {/* Contact Info */}
-              <div className="flex-1">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h4 className="text-lg font-bold text-slate-900">Dr. Ana Larranaga</h4>
-                    <p className="text-slate-600 text-sm mb-1">University of Washington</p>
-                    <p className="text-slate-500 text-xs">Questions about pySINDy implementation and issues</p>
-                  </div>
-                  
-                  {/* Contact Links */}
-                  <div className="flex gap-2 ml-4">
-                    <a 
-                      href="mailto:alarra@uw.edu" 
-                      className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
-                      title="Email Dr. Larranaga"
-                    >
-                      <svg className="w-4 h-4 text-slate-600 group-hover:text-slate-800" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
-                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
-                      </svg>
-                    </a>
-                    
-                    <a 
-                      href="https://github.com" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
-                      title="GitHub Profile"
-                    >
-                      <Github className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          </div>            
-          
-            {/* FAQ Section */}
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
-              <h3 className="text-xl font-semibold text-slate-900 mb-6">Frequently Asked Questions</h3>
-              <div className="space-y-4">
-                {faqItems.map((faq, index) => (
-                  <div key={index} className="border border-slate-200 rounded-lg bg-white/50">
-                    <button
-                      onClick={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
-                      className="w-full flex items-center justify-between p-4 text-left hover:bg-slate-50/50 transition-colors rounded-lg"
-                    >
-                      <span className="font-medium text-slate-900 pr-4">{faq.q}</span>
-                      {expandedFAQ === index ? (
-                        <ChevronDown className="w-4 h-4 text-slate-600 flex-shrink-0" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4 text-slate-600 flex-shrink-0" />
-                      )}
-                    </button>
-                    {expandedFAQ === index && (
-                      <div className="px-4 pb-4">
-                        <p className="text-slate-600 text-sm leading-relaxed">{faq.a}</p>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
           </section>
 
-        </main>
-      </div>
+          </main>
+          </div>
 
-      {/* Footer */}
-      <Footer />
+          {/* Footer */}
+          <Footer />
     </div>
   );
-} 
+}
