@@ -1,7 +1,7 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { ChevronDown, ChevronRight, Play, Github, Book, Zap, Users, CheckCircle, Code, Terminal, Lightbulb, Star, ArrowRight, Youtube, ExternalLink, Target, BarChart3, Cpu, Copy, Check, LineChart, Database, Orbit, Zap as ZapIcon, ChevronLeft, Home, Rocket, FileCode } from 'lucide-react';
+import { ChevronDown, ChevronRight, Play, Github, Book, Zap, Users, CheckCircle, Code, Terminal, Lightbulb, Star, ArrowRight, Youtube, ExternalLink, Target, BarChart3, Cpu, Copy, Check, LineChart, Database, Orbit, Bolt, ChevronLeft, Home, Rocket, FileCode } from 'lucide-react';
 
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -29,7 +29,9 @@ export default function HomePage() {
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [animationData, setAnimationData] = useState<DemoData[]>([]);
   const [copiedStates, setCopiedStates] = useState<CopiedStates>({});
+  const [currentStep, setCurrentStep] = useState<number>(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number | null>(null);
   
   // Demo simulation logic
   const demoOptions = [
@@ -44,7 +46,7 @@ export default function HomePage() {
     { id: 'python', name: 'Python (PySINDy)', icon: LineChart },
     { id: 'matlab', name: 'MATLAB', icon: BarChart3 },
     { id: 'julia', name: 'Julia', icon: Orbit },
-    { id: 'cpp', name: 'C++', icon: ZapIcon }
+    { id: 'cpp', name: 'C++', icon: Bolt }
   ];
 
   const codeExamples = {
@@ -268,17 +270,19 @@ public:
 };`
   };
 
-  // Simplified simulation functions for demo
-  const generateDemoData = (systemType: string, steps: number = 1000): DemoData[] => {
+  // Improved simulation functions for demo
+  const generateDemoData = useCallback((systemType: string, steps: number = 2000): DemoData[] => {
     const data: DemoData[] = [];
     const dt = 0.01;
     
     if (systemType === 'lorenz') {
       let x = -8, y = 8, z = 27;
+      const sigma = 10, rho = 28, beta = 8/3;
+      
       for (let i = 0; i < steps; i++) {
-        const dx = 10 * (y - x);
-        const dy = x * (28 - z) - y;
-        const dz = x * y - (8/3) * z;
+        const dx = sigma * (y - x);
+        const dy = x * (rho - z) - y;
+        const dz = x * y - beta * z;
         
         x += dx * dt;
         y += dy * dt;
@@ -288,106 +292,196 @@ public:
       }
     } else if (systemType === 'vanderpol') {
       let u = 2, v = 0;
+      const mu = 1;
+      
       for (let i = 0; i < steps; i++) {
         const du = v;
-        const dv = -u + (1 - u*u) * v;
+        const dv = mu * (1 - u * u) * v - u;
         
         u += du * dt;
         v += dv * dt;
         
         data.push({ x: u, y: v, step: i });
       }
-    } else {
-      // Generate sample data for other systems
+    } else if (systemType === 'duffing') {
+      let x = 1, y = 0;
+      const alpha = -1, beta = 1, gamma = 0.3, omega = 1.2;
+      
       for (let i = 0; i < steps; i++) {
-        data.push({
-          x: Math.sin(i * 0.1) * Math.cos(i * 0.05),
-          y: Math.cos(i * 0.1) * Math.sin(i * 0.05),
-          z: Math.sin(i * 0.02),
-          step: i
-        });
+        const t = i * dt;
+        const dx = y;
+        const dy = -alpha * x - beta * x * x * x + gamma * Math.cos(omega * t);
+        
+        x += dx * dt;
+        y += dy * dt;
+        
+        data.push({ x, y, step: i });
+      }
+    } else if (systemType === 'lotka') {
+      let x = 10, y = 5;
+      const alpha = 1.5, beta = 1, gamma = 3, delta = 0.75;
+      
+      for (let i = 0; i < steps; i++) {
+        const dx = alpha * x - beta * x * y;
+        const dy = delta * x * y - gamma * y;
+        
+        x += dx * dt;
+        y += dy * dt;
+        
+        data.push({ x, y, step: i });
       }
     }
     
     return data;
-  };
+  }, []);
 
-  // Canvas animation
-  useEffect(() => {
-    if (isRunning && canvasRef.current) {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-      
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      const scale = 8;
-      
-      let currentStep = 0;
-      const data = animationData;
-      
-      const animate = () => {
-        if (currentStep >= data.length || !isRunning) {
-          setIsRunning(false);
-          return;
-        }
-        
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        
-        // Draw trajectory
-        ctx.strokeStyle = '#3b82f6';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        
-        for (let i = 0; i < Math.min(currentStep, data.length - 1); i++) {
-          const point = data[i];
-          const x = centerX + point.x * scale;
-          const y = centerY - point.y * scale;
-          
-          if (i === 0) {
-            ctx.moveTo(x, y);
-          } else {
-            ctx.lineTo(x, y);
-          }
-        }
-        ctx.stroke();
-        
-        // Draw current point
-        if (currentStep < data.length) {
-          const current = data[currentStep];
-          const x = centerX + current.x * scale;
-          const y = centerY - current.y * scale;
-          
-          ctx.fillStyle = '#ef4444';
-          ctx.beginPath();
-          ctx.arc(x, y, 4, 0, 2 * Math.PI);
-          ctx.fill();
-        }
-        
-        currentStep += 2;
-        setTimeout(() => requestAnimationFrame(animate), 50);
-      };
-      
-      animate();
-    }
-  }, [isRunning, animationData]);
-
-  const runDemo = () => {
-    const data = generateDemoData(selectedDemo);
-    setAnimationData(data);
-    setIsRunning(true);
-  };
-
-  const resetDemo = () => {
+  // Improved reset function
+  const resetDemo = useCallback(() => {
     setIsRunning(false);
+    setCurrentStep(0);
     setAnimationData([]);
+    
+    // Cancel any running animation
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current);
+      animationRef.current = null;
+    }
+    
+    // Clear canvas
     if (canvasRef.current) {
       const ctx = canvasRef.current.getContext('2d');
       if (ctx) {
         ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        
+        // Draw axes for reference
+        const centerX = canvasRef.current.width / 2;
+        const centerY = canvasRef.current.height / 2;
+        
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2, 2]);
+        
+        // Horizontal axis
+        ctx.beginPath();
+        ctx.moveTo(0, centerY);
+        ctx.lineTo(canvasRef.current.width, centerY);
+        ctx.stroke();
+        
+        // Vertical axis
+        ctx.beginPath();
+        ctx.moveTo(centerX, 0);
+        ctx.lineTo(centerX, canvasRef.current.height);
+        ctx.stroke();
+        
+        ctx.setLineDash([]);
       }
     }
-  };
+  }, []);
+
+  // Improved animation loop
+  const animate = useCallback(() => {
+    if (!isRunning || !canvasRef.current || currentStep >= animationData.length) {
+      setIsRunning(false);
+      return;
+    }
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const scale = selectedDemo === 'lorenz' ? 4 : 8;
+    
+    // Draw axes
+    ctx.strokeStyle = '#e2e8f0';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([2, 2]);
+    
+    ctx.beginPath();
+    ctx.moveTo(0, centerY);
+    ctx.lineTo(canvas.width, centerY);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(centerX, 0);
+    ctx.lineTo(centerX, canvas.height);
+    ctx.stroke();
+    
+    ctx.setLineDash([]);
+    
+    // Draw trajectory with fading trail
+    const trailLength = Math.min(200, currentStep);
+    const startIdx = Math.max(0, currentStep - trailLength);
+    
+    for (let i = startIdx; i < currentStep - 1; i++) {
+      const point = animationData[i];
+      const nextPoint = animationData[i + 1];
+      
+      const alpha = (i - startIdx) / trailLength;
+      ctx.strokeStyle = `rgba(59, 130, 246, ${alpha * 0.8})`;
+      ctx.lineWidth = alpha * 2 + 0.5;
+      
+      const x = centerX + point.x * scale;
+      const y = centerY - point.y * scale;
+      const nextX = centerX + nextPoint.x * scale;
+      const nextY = centerY - nextPoint.y * scale;
+      
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(nextX, nextY);
+      ctx.stroke();
+    }
+    
+    // Draw current point
+    if (currentStep < animationData.length) {
+      const current = animationData[currentStep];
+      const x = centerX + current.x * scale;
+      const y = centerY - current.y * scale;
+      
+      // Current position with glow effect
+      ctx.shadowColor = '#ef4444';
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(x, y, 4, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+    
+    setCurrentStep(prev => prev + 2);
+    animationRef.current = requestAnimationFrame(animate);
+  }, [isRunning, currentStep, animationData, selectedDemo]);
+
+  // Effect to start animation
+  useEffect(() => {
+    if (isRunning && animationData.length > 0) {
+      animationRef.current = requestAnimationFrame(animate);
+    }
+    
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isRunning, animate, animationData]);
+
+  // Reset when demo selection changes
+  useEffect(() => {
+    resetDemo();
+  }, [selectedDemo, resetDemo]);
+
+  const runDemo = useCallback(() => {
+    if (isRunning) return;
+    
+    resetDemo();
+    const data = generateDemoData(selectedDemo);
+    setAnimationData(data);
+    setCurrentStep(0);
+    setIsRunning(true);
+  }, [selectedDemo, generateDemoData, resetDemo, isRunning]);
 
   // Copy code functionality
   const copyCode = async (codeKey: string) => {
@@ -581,10 +675,15 @@ public:
                     </div>
                     <canvas 
                       ref={canvasRef}
-                      width={300}
-                      height={200}
+                      width={400}
+                      height={250}
                       className="w-full h-48 bg-slate-800 rounded-lg border border-slate-700"
                     />
+                    {isRunning && (
+                      <div className="mt-2 text-green-400 text-xs">
+                        Step: {currentStep} / {animationData.length}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -641,6 +740,115 @@ public:
                   </div>
                 </div>
               </div>
+            </div>
+          </section>
+
+          {/* Video Resources Section with Steve Brunton's 4-Part Series */}
+          <section id="videos" className="space-y-8">
+            <div className="text-center space-y-4">
+              <div className="inline-flex items-center gap-2 bg-red-100 text-red-800 px-4 py-2 rounded-full text-sm font-medium">
+                <Youtube className="h-4 w-4" />
+                Essential Tutorial Series
+              </div>
+              <h2 className="text-4xl font-bold text-slate-900">Master SINDy with Steve Brunton</h2>
+              <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
+                Learn SINDy from the creator himself with this comprehensive 4-part tutorial series covering theory, implementation, and applications.
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-8">
+              {[
+                {
+                  title: "Part 1: Introduction to SINDy",
+                  description: "Introduction to SINDy methodology, data requirements, and how to distinguish between competing model candidates.",
+                  duration: "24 min",
+                  level: "Beginner",
+                  url: "https://www.youtube.com/watch?v=NxAn0oglMVw&list=PLMrJAkhIeNNQ2eKXI_EV8Qc-b-6kDaKBz&index=2",
+                  thumbnailId: "NxAn0oglMVw"
+                },
+                {
+                  title: "Part 2: Training Data & Disambiguating Models", 
+                  description: "Deep dive into the required sampling rate and duration for clean data and how to compute SINDy for noisy data.",
+                  duration: "18 min",
+                  level: "Intermediate",
+                  url: "https://www.youtube.com/watch?v=8-hoWTJwmrE",
+                  thumbnailId: "8-hoWTJwmrE"
+                },
+                {
+                  title: "Part 3: Effective Coordinates for Parsimonious Models",
+                  description: "Considering how high dimensional and low dimensional measurements of a nonlinear dynamical system",
+                  duration: "20 min", 
+                  level: "Advanced",
+                  url: "https://www.youtube.com/watch?v=1vrsBg92Xzo",
+                  thumbnailId: "1vrsBg92Xzo"
+                },
+                {
+                  title: "Part 4: The Library of Candidate Nonlinearities",
+                  description: "Discussing how to extend SINDy to include control variables and bifurcation parameters, as well as to include more general rational functions.",
+                  duration: "27 min",
+                  level: "Advanced",
+                  url: "https://www.youtube.com/watch?v=MmMNQe_EtCw", 
+                  thumbnailId: "MmMNQe_EtCw"
+                }
+              ].map((video, index) => (
+                <a key={index}
+                  href={video.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/70 backdrop-blur-sm rounded-xl border border-slate-200/50 hover:shadow-lg transition-shadow cursor-pointer group block overflow-hidden"
+                >
+                  {/* Video Thumbnail */}
+                  <div className="relative">
+                    <img 
+                      src={`https://img.youtube.com/vi/${video.thumbnailId}/maxresdefault.jpg`}
+                      alt={video.title}
+                      className="w-full h-48 object-cover"
+                      onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                        // Fallback to default thumbnail if maxres doesn't exist
+                        const target = e.target as HTMLImageElement;
+                        target.src = `https://img.youtube.com/vi/${video.thumbnailId}/hqdefault.jpg`;
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+                    <div className="absolute top-4 right-4 bg-black/50 rounded-lg p-2 group-hover:scale-110 transition-transform">
+                      <Play className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="absolute bottom-4 left-4 flex gap-2">
+                      <span className="bg-black/50 text-white px-2 py-1 rounded text-xs">{video.duration}</span>
+                      <span className="bg-black/50 text-white px-2 py-1 rounded text-xs">{video.level}</span>
+                    </div>
+                    <div className="absolute top-4 left-4">
+                      <span className="bg-red-600 text-white px-2 py-1 rounded text-xs font-medium">
+                        Part {index + 1}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-red-600 transition-colors">
+                      {video.title}
+                    </h3>
+                    <p className="text-slate-600 mb-4 text-sm leading-relaxed">{video.description}</p>
+                    <span className="text-red-600 hover:text-red-700 font-medium flex items-center gap-2 text-sm group-hover:gap-3 transition-all">
+                      Watch Tutorial 
+                      <ExternalLink className="h-4 w-4" />
+                    </span>
+                  </div>
+                </a>
+              ))}
+            </div>
+
+            <div className="text-center">
+              <a 
+                href="https://www.youtube.com/@Eigensteve"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors group"
+              >
+                <Youtube className="h-5 w-5" />
+                Watch More
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </a>
             </div>
           </section>
 
@@ -846,81 +1054,6 @@ public:
                   </div>
                 </div>
               </div>
-            </div>
-          </section>
-
-          {/* Video Resources Section with Actual Video Thumbnails */}
-          <section id="videos" className="space-y-8">
-            <div className="text-center space-y-4">
-              <div className="inline-flex items-center gap-2 bg-red-100 text-red-800 px-4 py-2 rounded-full text-sm font-medium">
-                <Youtube className="h-4 w-4" />
-                Learning Resources
-              </div>
-              <h2 className="text-4xl font-bold text-slate-900">Expert Video Tutorials</h2>
-              <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
-                Learn from the creators and leading researchers with comprehensive video explanations and tutorials.
-              </p>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-8">
-              {[
-                {
-                  title: "SINDy Introduction",
-                  description: "A comprehensive overview of the SINDy methodology by the original authors",
-                  duration: "45 min",
-                  level: "Beginner",
-                  url: "https://www.youtube.com/watch?v=gSCa78TIldg",
-                  thumbnailId: "gSCa78TIldg"
-                },
-                {
-                  title: "Advanced Applications",
-                  description: "Real-world case studies including fluid dynamics and biological systems",
-                  duration: "Playlist",
-                  level: "Advanced", 
-                  url: "https://www.youtube.com/watch?v=NxAn0oglMVw&list=PLq7sjSxACEo6iRtnbLShncBn-alTQb1GS",
-                  thumbnailId: "NxAn0oglMVw"
-                }
-              ].map((video, index) => (
-                <a key={index}
-                  href={video.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white/70 backdrop-blur-sm rounded-xl border border-slate-200/50 hover:shadow-lg transition-shadow cursor-pointer group block overflow-hidden"
-                >
-                  {/* Video Thumbnail */}
-                  <div className="relative">
-                    <img 
-                      src={`https://img.youtube.com/vi/${video.thumbnailId}/maxresdefault.jpg`}
-                      alt={video.title}
-                      className="w-full h-48 object-cover"
-                      onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                        // Fallback to default thumbnail if maxres doesn't exist
-                        const target = e.target as HTMLImageElement;
-                        target.src = `https://img.youtube.com/vi/${video.thumbnailId}/hqdefault.jpg`;
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
-                    <div className="absolute top-4 right-4 bg-black/50 rounded-lg p-2 group-hover:scale-110 transition-transform">
-                      <Play className="h-5 w-5 text-white" />
-                    </div>
-                    <div className="absolute bottom-4 left-4 flex gap-2">
-                      <span className="bg-black/50 text-white px-2 py-1 rounded text-xs">{video.duration}</span>
-                      <span className="bg-black/50 text-white px-2 py-1 rounded text-xs">{video.level}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="p-6">
-                    <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-red-600 transition-colors">
-                      {video.title}
-                    </h3>
-                    <p className="text-slate-600 mb-4 text-sm leading-relaxed">{video.description}</p>
-                    <span className="text-red-600 hover:text-red-700 font-medium flex items-center gap-2 text-sm group-hover:gap-3 transition-all">
-                      Watch Video 
-                      <ExternalLink className="h-4 w-4" />
-                    </span>
-                  </div>
-                </a>
-              ))}
             </div>
           </section>
 

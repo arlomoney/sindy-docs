@@ -1,6 +1,8 @@
 "use client"
-import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, Play, Download, Github, Book, Zap, Users, CheckCircle, AlertCircle, Code, Terminal, Lightbulb, Rocket, Star, ArrowRight, X, AlertTriangle, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import Link from 'next/link';
+import { ChevronDown, ChevronRight, Play, Youtube, Download, Github, Book, Zap, Users, CheckCircle, AlertCircle, Code, Terminal, Lightbulb, Rocket, Star, ArrowRight, X, AlertTriangle, ExternalLink } from 'lucide-react';
+
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -59,42 +61,43 @@ export default function PySINDyPage() {
         </div>
       </header>
 
-      {/* Version Disclaimer Banner */}
-      {showDisclaimer && (
-        <div className="bg-amber-50 border-b border-amber-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="py-3 flex items-center justify-between">
-              <div className="flex items-start space-x-3 flex-1">
-                <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                <div className="text-sm">
-                  <p className="text-amber-900 font-medium">
-                    Tutorial Compatibility Notice
-                  </p>
-                  <p className="text-amber-800 mt-1">
-                    To follow along with the current tutorials, please install pySINDy version 1.7.5 (stable release). 
-                    The latest version (2.0+) includes breaking changes that are not yet reflected in all documentation.
-                    <span className="font-mono bg-amber-100 px-2 py-0.5 rounded ml-2">pip install pysindy==1.7.5</span>
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setShowDisclaimer(false)}
-                className="ml-4 p-1 hover:bg-amber-100 rounded transition-colors"
-                aria-label="Dismiss"
-              >
-                <X className="w-5 h-5 text-amber-600" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       <div className="flex max-w-7xl mx-auto">
         {/* Sidebar Navigation */}
         <Navbar currentPage="pysindy" />
 
         {/* Main Content */}
         <main className="flex-1 p-8 space-y-16">
+          {/* Version Disclaimer Banner */}
+          {showDisclaimer && (
+            <div className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200/60 rounded-lg shadow-sm">
+              <div className="px-4 py-3 flex items-center justify-between">
+                <div className="flex items-center space-x-3 flex-1">
+                  <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <AlertTriangle className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-red-900 text-sm font-medium">
+                      Tutorial Compatibility Notice
+                    </p>
+                    <p className="text-red-800 text-sm mt-0.5">
+                      For tutorials, use stable version 1.7.5. Latest version (2.0+) has breaking changes.
+                      <code className="inline-flex items-center gap-1 font-mono bg-red-100 text-red-900 px-2 py-0.5 rounded text-xs ml-2">
+                        pip install pysindy==1.7.5
+                      </code>
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowDisclaimer(false)}
+                  className="ml-3 p-1.5 hover:bg-red-100 rounded-md transition-colors"
+                  aria-label="Dismiss"
+                >
+                  <X className="w-4 h-4 text-red-600" />
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Overview Section */}
           <section id="overview" className="space-y-8">
             <div className="text-center space-y-6">
@@ -247,7 +250,7 @@ export default function PySINDyPage() {
                 <div className="space-y-4">
                   <div className="bg-slate-900 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-yellow-400 font-mono text-sm">Conda install (reccomended)</span>
+                      <span className="text-yellow-400 font-mono text-sm">Conda install (recommended)</span>
                       <button className="text-slate-400 hover:text-white text-xs">Copy</button>
                     </div>
                     <code className="text-yellow-400 font-mono">conda install -c conda-forge pysindy</code>
@@ -304,13 +307,22 @@ export default function PySINDyPage() {
               </div>
               <h2 className="text-4xl font-bold text-slate-900">Your First pySINDy Model</h2>
               <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
-                Get started with pySINDy in 5 minutes
+                Follow this step-by-step tutorial to discover the Lorenz equations from data
               </p>
             </div>
 
             <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
-              <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-slate-900">Basic Usage Example</h3>                
+              <div className="space-y-8">
+                
+                {/* Step 1: Import Libraries */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 bg-purple-600 text-white rounded-lg flex items-center justify-center text-sm font-bold">1</div>
+                    <h3 className="text-xl font-semibold text-slate-900">Import Libraries and Setup</h3>
+                  </div>
+                  <p className="text-slate-600 mb-4">
+                    First, let's import the necessary libraries for data generation, integration, and modeling.
+                  </p>
                   
                   <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
                     <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
@@ -318,7 +330,7 @@ export default function PySINDyPage() {
                         <div className="w-3 h-3 rounded-full bg-red-500"></div>
                         <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                         <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                        <span className="ml-2">lorenz_example.py</span>
+                        <span className="ml-2">Step 1: Import Libraries</span>
                       </span>
                       <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
                         Copy
@@ -326,76 +338,340 @@ export default function PySINDyPage() {
                     </div>
                     
                     <pre className="text-sm text-slate-300 overflow-x-auto p-6 bg-slate-900 font-mono leading-relaxed">
-    <code>{`import numpy as np
+<code>{`# Essential libraries for data manipulation and visualization
+import numpy as np
 import matplotlib.pyplot as plt
+from scipy.integrate import odeint
+
+# Import the main pySINDy class
 from pysindy import SINDy
 
-# Generate training data for the Lorenz system
-dt = 0.002
-t_train = np.arange(0, 10, dt)
-x0_train = [-8, 8, 27]
+# Set random seed for reproducible results
+np.random.seed(42)
 
-def lorenz(state, t):
-    x, y, z = state
-    return [10.0 * (y - x), x * (28.0 - z) - y, x * y - (8.0 / 3.0) * z]
-
-# Integrate the Lorenz equations
-from scipy.integrate import odeint
-x_train = odeint(lorenz, x0_train, t_train)
-
-# Fit the SINDy model
-model = SINDy()
-model.fit(x_train, t=dt)
-
-# Print the discovered equations
-model.print()
-
-# Make predictions
-x_test = model.predict(x_train, t=dt)
-
-# Plot results
-plt.figure(figsize=(12, 4))
-plt.subplot(131)
-plt.plot(t_train, x_train[:, 0], 'b-', label='True')
-plt.plot(t_train, x_test[:, 0], 'r--', label='SINDy')
-plt.xlabel('Time')
-plt.ylabel('x')
-plt.legend()
-plt.show()`}</code>
+print("✅ Libraries imported successfully!")
+print(f"📦 NumPy version: {np.__version__}")
+print("🚀 Ready to discover equations from data!")`}</code>
                     </pre>
                   </div>
                 </div>
-                <div className="mt-12 grid md:grid-cols-2 gap-8">
-                  {/* What this code does */}
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-slate-900">What this code does:</h4>
-                    <ul className="space-y-2 text-sm text-slate-600">
-                      <li className="flex items-start space-x-2">
-                        <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span>Generates synthetic data from the Lorenz system</span>
-                      </li>
-                      <li className="flex items-start space-x-2">
-                        <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span>Fits a SINDy model to discover the equations</span>
-                      </li>
-                      <li className="flex items-start space-x-2">
-                        <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span>Makes predictions and visualizes results</span>
-                      </li>
+
+                {/* Step 2: Generate Training Data */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center text-sm font-bold">2</div>
+                    <h3 className="text-xl font-semibold text-slate-900">Generate Training Data</h3>
+                  </div>
+                  <p className="text-slate-600 mb-4">
+                    Create synthetic data from the famous Lorenz system - a chaotic dynamical system with three variables (x, y, z).
+                  </p>
+                  
+                  <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
+                    <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
+                      <span className="text-slate-300 font-mono text-sm flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                        <span className="ml-2">Step 2: Generate Training Data</span>
+                      </span>
+                      <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
+                        Copy
+                      </button>
+                    </div>
+                    
+                    <pre className="text-sm text-slate-300 overflow-x-auto p-6 bg-slate-900 font-mono leading-relaxed">
+<code>{`# Define the Lorenz system equations
+def lorenz(state, t, sigma=10.0, beta=8.0/3.0, rho=28.0):
+    """
+    The Lorenz system: a famous chaotic dynamical system
+    
+    dx/dt = sigma * (y - x)
+    dy/dt = x * (rho - z) - y  
+    dz/dt = x * y - beta * z
+    """
+    x, y, z = state
+    return [
+        sigma * (y - x),           # dx/dt
+        x * (rho - z) - y,         # dy/dt  
+        x * y - beta * z           # dz/dt
+    ]
+
+# Simulation parameters
+dt = 0.002                    # Time step (small for accuracy)
+t_train = np.arange(0, 10, dt)  # Time from 0 to 10 seconds
+x0_train = [-8, 8, 27]        # Initial conditions [x0, y0, z0]
+
+print(f"⏱️  Time points: {len(t_train)}")
+print(f"🎯 Initial condition: {x0_train}")
+print(f"📏 Time step: {dt}")
+
+# Integrate the Lorenz equations to generate "measurement" data
+x_train = odeint(lorenz, x0_train, t_train)
+
+print(f"✅ Generated training data with shape: {x_train.shape}")
+print(f"📊 Data ranges - x: [{x_train[:,0].min():.1f}, {x_train[:,0].max():.1f}]")
+print(f"                y: [{x_train[:,1].min():.1f}, {x_train[:,1].max():.1f}]") 
+print(f"                z: [{x_train[:,2].min():.1f}, {x_train[:,2].max():.1f}]")`}</code>
+                    </pre>
+                  </div>
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h4 className="font-semibold text-blue-900 mb-2">💡 What's Happening Here?</h4>
+                    <ul className="text-blue-800 text-sm space-y-1">
+                      <li>• We define the true Lorenz equations (these are what SINDy will try to rediscover)</li>
+                      <li>• We integrate these equations to generate realistic "sensor measurements"</li>
+                      <li>• The result is a time series of x, y, z values that follow chaotic dynamics</li>
                     </ul>
                   </div>
+                </div>
 
-                  {/* Expected output */}
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-slate-900">Expected output:</h4>
-                    <div className="text-slate-600 p-3 rounded-lg font-mono text-sm">
-                      <div>x' = -10.000 x + 10.000 y</div>
-                      <div>y' = 27.994 x - 0.999 y - 1.000 x z</div>
-                      <div>z' = -2.666 z + 1.000 x y</div>
+                {/* Step 3: Fit SINDy Model */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 bg-green-600 text-white rounded-lg flex items-center justify-center text-sm font-bold">3</div>
+                    <h3 className="text-xl font-semibold text-slate-900">Fit SINDy Model</h3>
+                  </div>
+                  <p className="text-slate-600 mb-4">
+                    Now the magic happens! SINDy will automatically discover the governing equations from the data.
+                  </p>
+                  
+                  <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
+                    <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
+                      <span className="text-slate-300 font-mono text-sm flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                        <span className="ml-2">Step 3: Fit SINDy Model</span>
+                      </span>
+                      <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
+                        Copy
+                      </button>
+                    </div>
+                    
+                    <pre className="text-sm text-slate-300 overflow-x-auto p-6 bg-slate-900 font-mono leading-relaxed">
+<code>{`# Initialize the SINDy model with default settings
+# - Uses polynomial features up to degree 2 (x, y, z, x*y, x*z, etc.)
+# - Uses STLSQ optimizer with automatic thresholding
+model = SINDy()
+
+print("🔧 Initializing SINDy model...")
+print("📚 Feature library: Polynomial (degree 2)")  
+print("🎯 Optimizer: STLSQ (Sequential Thresholded Least Squares)")
+
+# Fit the model to discover the equations
+print("\\n🚀 Discovering equations from data...")
+model.fit(x_train, t=dt)
+print("✅ Model fitting complete!")
+
+# Display the discovered equations  
+print("\\n🎉 DISCOVERED EQUATIONS:")
+print("=" * 50)
+model.print()
+print("=" * 50)`}</code>
+                    </pre>
+                  </div>
+                  
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h4 className="font-semibold text-green-900 mb-2">🎯 Expected Output:</h4>
+                    <div className="font-mono text-sm text-green-800 bg-green-100 p-3 rounded">
+                      <div>x0' = -10.000 x0 + 10.000 x1</div>
+                      <div>x1' = 27.994 x0 - 0.999 x1 - 1.000 x0 x2</div>
+                      <div>x2' = -2.666 x2 + 1.000 x0 x1</div>
+                    </div>
+                    <p className="text-green-700 text-sm mt-2">
+                      Compare with true Lorenz equations - SINDy should recover the exact coefficients!
+                    </p>
+                  </div>
+                </div>
+
+                {/* Step 4: Validate Results */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 bg-orange-600 text-white rounded-lg flex items-center justify-center text-sm font-bold">4</div>
+                    <h3 className="text-xl font-semibold text-slate-900">Validate the Model</h3>
+                  </div>
+                  <p className="text-slate-600 mb-4">
+                    Test how well our discovered equations can predict the system's behavior.
+                  </p>
+                  
+                  <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
+                    <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
+                      <span className="text-slate-300 font-mono text-sm flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                        <span className="ml-2">Step 4: Validate Results</span>
+                      </span>
+                      <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
+                        Copy
+                      </button>
+                    </div>
+                    
+                    <pre className="text-sm text-slate-300 overflow-x-auto p-6 bg-slate-900 font-mono leading-relaxed">
+<code>{`# Use the discovered model to make predictions
+print("🔮 Making predictions with discovered equations...")
+x_test = model.predict(x_train, t=dt)
+
+# Calculate prediction accuracy
+mse = np.mean((x_train - x_test)**2)
+print(f"📊 Mean Squared Error: {mse:.2e}")
+
+# Calculate R² score for each variable
+from sklearn.metrics import r2_score
+r2_scores = [r2_score(x_train[:, i], x_test[:, i]) for i in range(3)]
+print(f"🎯 R² Scores:")
+print(f"   x-variable: {r2_scores[0]:.6f}")
+print(f"   y-variable: {r2_scores[1]:.6f}")  
+print(f"   z-variable: {r2_scores[2]:.6f}")
+print(f"   Average: {np.mean(r2_scores):.6f}")
+
+if np.mean(r2_scores) > 0.99:
+    print("🎉 Excellent! The model captures the dynamics very well!")
+elif np.mean(r2_scores) > 0.95:
+    print("✅ Good! The model captures most of the dynamics.")
+else:
+    print("⚠️  Model may need tuning or more data.")`}</code>
+                    </pre>
+                  </div>
+                </div>
+
+                {/* Step 5: Visualize */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-8 h-8 bg-purple-600 text-white rounded-lg flex items-center justify-center text-sm font-bold">5</div>
+                    <h3 className="text-xl font-semibold text-slate-900">Visualize Results</h3>
+                  </div>
+                  <p className="text-slate-600 mb-4">
+                    Create plots to compare the true data with SINDy's predictions.
+                  </p>
+                  
+                  <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
+                    <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
+                      <span className="text-slate-300 font-mono text-sm flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                        <span className="ml-2">Step 5: Visualize Results</span>
+                      </span>
+                      <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
+                        Copy
+                      </button>
+                    </div>
+                    
+                    <pre className="text-sm text-slate-300 overflow-x-auto p-6 bg-slate-900 font-mono leading-relaxed">
+<code>{`# Create comprehensive visualization
+fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+fig.suptitle('SINDy Discovery Results: Lorenz System', fontsize=16, fontweight='bold')
+
+# Time series comparison
+variables = ['x', 'y', 'z']
+colors = ['red', 'green', 'blue']
+
+for i, (var, color) in enumerate(zip(variables, colors)):
+    ax = axes[0, 0] if i < 2 else axes[0, 1] if i == 2 else None
+    if i < 2:  # Plot x and y in first subplot, z in second
+        ax = axes[0, 0] if i == 0 else axes[0, 1]
+        ax.plot(t_train[:1000], x_train[:1000, i], color=color, 
+                linewidth=2, label=f'True {var}', alpha=0.8)
+        ax.plot(t_train[:1000], x_test[:1000, i], '--', color='black', 
+                linewidth=1.5, label=f'SINDy {var}', alpha=0.7)
+        ax.set_xlabel('Time')
+        ax.set_ylabel(f'{var}(t)')
+        ax.set_title(f'{var.upper()}-component Comparison')
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+
+# 3D phase portrait comparison  
+ax1 = axes[0, 1]
+ax1 = fig.add_subplot(2, 2, 2, projection='3d')
+ax1.plot(x_train[::10, 0], x_train[::10, 1], x_train[::10, 2], 
+         'b-', linewidth=0.8, alpha=0.7, label='True')
+ax1.plot(x_test[::10, 0], x_test[::10, 1], x_test[::10, 2], 
+         'r--', linewidth=0.8, alpha=0.7, label='SINDy')
+ax1.set_xlabel('x')
+ax1.set_ylabel('y') 
+ax1.set_zlabel('z')
+ax1.set_title('3D Phase Portrait')
+ax1.legend()
+
+# Error analysis
+ax2 = axes[1, 0]
+errors = np.abs(x_train - x_test)
+ax2.semilogy(t_train, errors[:, 0], 'r-', label='x error', alpha=0.7)
+ax2.semilogy(t_train, errors[:, 1], 'g-', label='y error', alpha=0.7)  
+ax2.semilogy(t_train, errors[:, 2], 'b-', label='z error', alpha=0.7)
+ax2.set_xlabel('Time')
+ax2.set_ylabel('Absolute Error (log scale)')
+ax2.set_title('Prediction Error Over Time')
+ax2.legend()
+ax2.grid(True, alpha=0.3)
+
+# Coefficient comparison
+ax3 = axes[1, 1]
+true_coeffs = np.array([[-10, 10, 0], [28, -1, -1], [0, 0, -8/3]])
+discovered_coeffs = model.coefficients()[:, [0, 1, 3]]  # Select relevant terms
+x_pos = np.arange(len(true_coeffs.flatten()))
+ax3.bar(x_pos - 0.2, true_coeffs.flatten(), 0.4, label='True', alpha=0.7)
+ax3.bar(x_pos + 0.2, discovered_coeffs.flatten(), 0.4, label='Discovered', alpha=0.7)
+ax3.set_xlabel('Coefficient Index')
+ax3.set_ylabel('Value')
+ax3.set_title('Coefficient Comparison')
+ax3.legend()
+ax3.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+
+print("🎨 Visualization complete!")
+print("📈 Check the plots to see how well SINDy discovered the equations!")`}</code>
+                    </pre>
+                  </div>
+                  
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <h4 className="font-semibold text-purple-900 mb-2">📊 What to Look For:</h4>
+                    <ul className="text-purple-800 text-sm space-y-1">
+                      <li>• <strong>Time series plots:</strong> True vs predicted trajectories should overlap closely</li>
+                      <li>• <strong>3D phase portrait:</strong> Both trajectories should follow the same chaotic attractor</li>
+                      <li>• <strong>Error analysis:</strong> Errors should remain small and stable over time</li>
+                      <li>• <strong>Coefficients:</strong> Discovered values should match true Lorenz parameters</li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Summary */}
+                <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-6">
+                  <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    🎉 Congratulations!
+                  </h4>
+                  <p className="text-slate-700 mb-4">
+                    You've successfully used pySINDy to discover the governing equations of a chaotic system from data alone. 
+                    This is the core power of SINDy - turning measurements into mathematical understanding.
+                  </p>
+                  <div className="grid md:grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <h5 className="font-semibold text-slate-900 mb-2">🎯 What You Learned:</h5>
+                      <ul className="text-slate-700 space-y-1">
+                        <li>• How to prepare time-series data for SINDy</li>
+                        <li>• Basic pySINDy workflow: fit, predict, validate</li>
+                        <li>• How to interpret discovered equations</li>
+                        <li>• Visualization techniques for model validation</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h5 className="font-semibold text-slate-900 mb-2">🚀 Next Steps:</h5>
+                      <ul className="text-slate-700 space-y-1">
+                        <li>• Try different feature libraries (Fourier, custom)</li>
+                        <li>• Experiment with noisy data and robust optimizers</li>
+                        <li>• Apply SINDy to your own datasets</li>
+                        <li>• Explore advanced tutorials below</li>
+                      </ul>
                     </div>
                   </div>
                 </div>
+
               </div>
+            </div>
           </section>
 
           {/* Tutorials Section */}
@@ -403,82 +679,130 @@ plt.show()`}</code>
             <div className="text-center space-y-4">
               <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-800 px-4 py-2 rounded-full text-sm font-medium">
                 <Lightbulb className="h-4 w-4" />
-                Tutorials & Guides
+                Video Tutorials
               </div>
-              <h2 className="text-4xl font-bold text-slate-900">Learn pySINDy Step by Step</h2>
+              <h2 className="text-4xl font-bold text-slate-900">Learn pySINDy with Alan Kaptanoglu</h2>
               <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
-                From beginner tutorials to advanced techniques
+                Comprehensive video lectures on pySINDy usage and practical tips from one of the core developers
               </p>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[
                 {
-                  title: 'Getting Started',
-                  description: 'Learn the basics of SINDy and your first model',
+                  title: 'Overview of PySINDy for Sparse System Identification',
+                  description: 'Getting started with a brief overview of the SINDy method',
+                  duration: '12 min',
                   level: 'Beginner',
-                  time: '15 min',
-                  color: 'green'
+                  color: 'green',
+                  url: 'https://www.youtube.com/watch?v=SfIJiuJ38W0&list=PLN90bHJU-JLoOfEk0KyBs2qLTV7OkMZ25&index=1',
+                  thumbnailId: 'SfIJiuJ38W0'
                 },
                 {
-                  title: 'Handling Noisy Data',
-                  description: 'Robust methods for real-world applications',
+                  title: 'Choosing Algorithm Hyperparameters',
+                  description: 'Use PySINDy to tune hyperparameters such as the amount of sparsity-promotion used in the SINDy algorithm.',
+                  duration: '12 min',
+                  level: 'Beginner',
+                  color: 'green',
+                  url: 'https://www.youtube.com/watch?v=HvOdfwgTPnM&list=PLN90bHJU-JLoOfEk0KyBs2qLTV7OkMZ25&index=2',
+                  thumbnailId: 'HvOdfwgTPnM'
+                },
+                {
+                  title: 'Robust Sparse System Identification',
+                  description: 'Understanding how PySINDy improves the performance of system identification.',
+                  duration: '9 min',
                   level: 'Intermediate',
-                  time: '30 min',
-                  color: 'blue'
+                  color: 'blue',
+                  url: 'https://www.youtube.com/watch?v=pyhFjNepfi4&list=PLN90bHJU-JLoOfEk0KyBs2qLTV7OkMZ25&index=3',
+                  thumbnailId: 'pyhFjNepfi4'
                 },
                 {
-                  title: 'Custom Feature Libraries',
-                  description: 'Extend pySINDy with your own functions',
+                  title: 'Robust Sparse System Identification by Ensembling',
+                  description: 'Showing a PySINDy method which can be used to generate multiple dynamical models, perform probabilistic model identification, and much more.',
+                  duration: '8 min',
                   level: 'Advanced',
-                  time: '45 min',
-                  color: 'purple'
+                  color: 'purple',
+                  url: 'https://www.youtube.com/watch?v=19Ku-idSptA&list=PLN90bHJU-JLoOfEk0KyBs2qLTV7OkMZ25&index=4',
+                  thumbnailId: '19Ku-idSptA'
                 },
                 {
-                  title: 'Control Systems',
-                  description: 'SINDy for systems with external inputs',
+                  title: 'Building in Physical Priors with Constraints',
+                  description: 'Showing how users can input physical constraints, conservation laws, or global stability theorems into data-driven models.',
+                  duration: '23 min',
                   level: 'Intermediate',
-                  time: '25 min',
-                  color: 'blue'
+                  color: 'blue',
+                  url: 'https://www.youtube.com/watch?v=cPI466f2_4c&list=PLN90bHJU-JLoOfEk0KyBs2qLTV7OkMZ25&index=5',
+                  thumbnailId: 'cPI466f2_4c'
                 },
                 {
-                  title: 'PDE Discovery',
-                  description: 'Find governing equations for PDEs',
+                  title: 'The Weak Formulation of SINDy and SINDy-PI',
+                  description: 'Learn how the weak formulation of SINDy can be used to gain very significant robustness against noise',
+                  duration: '18 min',
                   level: 'Advanced',
-                  time: '60 min',
-                  color: 'purple'
-                },
-                {
-                  title: 'Ensemble Methods',
-                  description: 'Improve robustness with multiple models',
-                  level: 'Advanced',
-                  time: '40 min',
-                  color: 'purple'
+                  color: 'purple',
+                  url: 'https://www.youtube.com/watch?v=_iBjhpryUc4&list=PLN90bHJU-JLoOfEk0KyBs2qLTV7OkMZ25&index=6',
+                  thumbnailId: '_iBjhpryUc4'
                 }
               ].map((tutorial, i) => (
-                <div key={i} className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50 hover:shadow-lg transition-shadow">
-                  <div className="space-y-4">
-                    <div className="flex items-start justify-between">
-                      <h3 className="font-semibold text-slate-900">{tutorial.title}</h3>
+                <a key={i}
+                  href={tutorial.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/70 backdrop-blur-sm rounded-xl border border-slate-200/50 hover:shadow-lg transition-shadow cursor-pointer group block overflow-hidden"
+                >
+                  {/* Video Thumbnail */}
+                  <div className="relative">
+                    <img 
+                      src={`https://img.youtube.com/vi/${tutorial.thumbnailId}/maxresdefault.jpg`}
+                      alt={tutorial.title}
+                      className="w-full h-48 object-cover"
+                      onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                        // Fallback to default thumbnail if maxres doesn't exist
+                        const target = e.target as HTMLImageElement;
+                        target.src = `https://img.youtube.com/vi/${tutorial.thumbnailId}/hqdefault.jpg`;
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors"></div>
+                    <div className="absolute top-4 right-4 bg-black/50 rounded-lg p-2 group-hover:scale-110 transition-transform">
+                      <Play className="h-5 w-5 text-white" />
+                    </div>
+                    <div className="absolute bottom-4 left-4 flex gap-2">
+                      <span className="bg-black/50 text-white px-2 py-1 rounded text-xs">{tutorial.duration}</span>
                       <span className={`px-2 py-1 rounded text-xs font-medium ${
-                        tutorial.color === 'green' ? 'bg-green-100 text-green-700' :
-                        tutorial.color === 'blue' ? 'bg-blue-100 text-blue-700' :
-                        'bg-purple-100 text-purple-700'
+                        tutorial.color === 'green' ? 'bg-green-500 text-white' :
+                        tutorial.color === 'blue' ? 'bg-blue-500 text-white' :
+                        'bg-purple-500 text-white'
                       }`}>
                         {tutorial.level}
                       </span>
                     </div>
-                    <p className="text-slate-600 text-sm">{tutorial.description}</p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-slate-500">{tutorial.time}</span>
-                      <button className="text-slate-700 hover:text-slate-800 text-sm font-medium flex items-center space-x-1">
-                        <span>Start</span>
-                        <ArrowRight className="w-3 h-3" />
-                      </button>
-                    </div>
                   </div>
-                </div>
+                  
+                  <div className="p-6">
+                    <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
+                      {tutorial.title}
+                    </h3>
+                    <p className="text-slate-600 mb-4 text-sm leading-relaxed">{tutorial.description}</p>
+                    <span className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-2 text-sm group-hover:gap-3 transition-all">
+                      Watch Tutorial 
+                      <ExternalLink className="h-4 w-4" />
+                    </span>
+                  </div>
+                </a>
               ))}
+            </div>
+
+            <div className="text-center">
+              <a 
+                href="https://www.youtube.com/playlist?list=PLN90bHJU-JLoOfEk0KyBs2qLTV7OkMZ25"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors group"
+              >
+                <Youtube className="h-5 w-5" />
+                Watch Full Playlist
+                <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </a>
             </div>
           </section>
 
@@ -741,20 +1065,7 @@ plt.show()`}</code>
                       <div className="font-medium text-slate-900">Discussions</div>
                       <div className="text-sm text-slate-600">Community Q&amp;A and discussions</div>
                     </div>
-                  </a>
-                  <a
-                    href="https://stackoverflow.com/questions/tagged/pysindy"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center space-x-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors"
-                  >
-                    <Book className="w-5 h-5 text-slate-600" />
-                    <div>
-                      <div className="font-medium text-slate-900">Stack Overflow</div>
-                      <div className="text-sm text-slate-600">Tag your questions with 'pysindy'</div>
-                    </div>
-                  </a>
-                </div>
+                  </a>                </div>
               </div>
 
               <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
@@ -773,20 +1084,7 @@ plt.show()`}</code>
                     >
                       Contributing Guide →
                     </a>
-                  </div>
-                  <div className="p-4 bg-slate-50 rounded-lg">
-                    <h4 className="font-medium text-slate-900 mb-2">Research</h4>
-                    <p className="text-sm text-slate-600 mb-3">
-                      Share your research applications and case studies with the community.
-                    </p>
-                    <a
-                      href="mailto:contact@sindy.org"
-                      className="text-slate-700 hover:text-slate-800 text-sm font-medium"
-                    >
-                      Submit Example →
-                    </a>
-                  </div>
-                </div>
+                  </div>                </div>
               </div>
             </div>
           </section>
