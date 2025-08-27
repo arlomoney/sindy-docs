@@ -511,16 +511,27 @@ Xi = optimizer.fit(Theta, x_dot).coef_`
                         </div>
                       </div>
 
-                      <div className="flex gap-2">
-                        <button className="flex-1 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors text-sm">
-                          <Play className="w-4 h-4 inline mr-2" />
-                          MATLAB Tutorial
-                        </button>
-                        <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
-                          <Code className="w-4 h-4 inline mr-2" />
-                          Python Version
-                        </button>
-                      </div>
+<div className="flex gap-2">
+  <a
+    href="https://github.com/urban-fasel/FiltonWorkshop2024/tree/main/Tutorials"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex-1 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors text-sm flex items-center justify-center"
+  >
+    <Play className="w-4 h-4 inline mr-2" />
+    MATLAB Tutorial
+  </a>
+
+  <a
+    href="https://github.com/dynamicslab/pysindy/tree/master/examples"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center justify-center"
+  >
+    <Code className="w-4 h-4 inline mr-2" />
+    Python Version
+  </a>
+</div>
                     </div>
                   </div>
                 </div>
@@ -552,7 +563,7 @@ Xi = optimizer.fit(Theta, x_dot).coef_`
                         <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                           <h5 className="font-medium text-purple-900 mb-2">Chaotic Logistic Map</h5>
                           <div className="font-mono text-sm text-purple-900 mb-2">
-                            x_{k+1} = μx_k(1-x_k) + η_k
+                            x_(k+1) = μx_k(1-x_k) + η_k
                           </div>
                           <p className="text-sm text-purple-800">Control bifurcation parameter μ for stability</p>
                         </div>
@@ -646,14 +657,27 @@ Xi = optimizer.fit(Theta, x_dot).coef_`
                     <p className="text-sm text-slate-600 mb-3">
                       Compare all three methods on the Lorenz system with noisy data to understand their trade-offs.
                     </p>
-                    <div className="flex gap-2">
-                      <button className="px-4 py-2 bg-slate-700 text-white rounded text-sm hover:bg-slate-800 transition-colors">
-                        MATLAB Examples
-                      </button>
-                      <button className="px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors">
-                        PySINDy Example 16
-                      </button>
-                    </div>
+<div className="flex gap-2">
+  <a
+    href="https://github.com/urban-fasel/FiltonWorkshop2024/tree/main/Tutorials"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex-1 px-4 py-2 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors text-sm flex items-center justify-center"
+  >
+    <Play className="w-4 h-4 inline mr-2" />
+    MATLAB Tutorial
+  </a>
+
+  <a
+    href="https://github.com/dynamicslab/pysindy/tree/master/examples"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm flex items-center justify-center"
+  >
+    <Code className="w-4 h-4 inline mr-2" />
+    Python Version
+  </a>
+</div>
                   </div>
                 </div>
               )}
@@ -778,7 +802,8 @@ Xi = optimizer.fit(Theta, x_dot).coef_`
                     </span>
                     <button className="text-slate-700 hover:text-slate-900 font-medium text-sm flex items-center gap-1">
                       Open Tutorial
-                      <ExternalLink className="w-3 h-3" />
+                      <ExternalLink className="w-3 h-3" href = "https://github.com/urban-fasel/FiltonWorkshop2024/blob/main/Tutorials/SINDy/duffing.m" />
+              
                     </button>
                   </div>
                 </div>
