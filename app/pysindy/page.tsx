@@ -929,102 +929,6 @@ print("📈 Check the plots to see how well SINDy discovered the equations!")`}<
                       </div>
                     </section>
 
-          {/* Contact Section */}
-          <section id="contact" className="space-y-8">
-            {/* Contact Card - Jake */}
-            <div className="space-y-4">
-              <h3 className="text-xl font-semibold text-slate-900">Contact</h3>
-              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50">
-                <div className="flex items-center gap-6">
-                  {/* Profile Image */}
-                  <div className="w-16 h-16 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
-                    <span className="text-white text-lg font-bold">JS</span>
-                  </div>
-
-                  {/* Contact Info */}
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="text-lg font-bold text-slate-900">Dr. Jake Stevens-Haas</h4>
-                        <p className="text-slate-600 text-sm mb-1">University of Washington</p>
-                        <p className="text-slate-500 text-xs">Questions about PySINDy implementation and issues</p>
-                      </div>
-
-                      {/* Contact Links */}
-                      <div className="flex gap-2 ml-4">
-                        <a 
-                          href="mailto:jacob.stevens.haas@gmail.com" 
-                          className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
-                          title="Email Dr. Jacob"
-                        >
-                          <svg className="w-4 h-4 text-slate-600 group-hover:text-slate-800" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
-                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
-                          </svg>
-                        </a>
-                        <a 
-                          href="https://github.com" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
-                          title="GitHub Profile"
-                        >
-                          <Github className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Contact Card - Yash */}
-            <div className="space-y-2">
-              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50">
-                <div className="flex items-center gap-6">
-                  {/* Profile Image */}
-                  <div className="w-16 h-16 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
-                    <span className="text-white text-lg font-bold">YB</span>
-                  </div>
-
-                  {/* Contact Info */}
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="text-lg font-bold text-slate-900">Yash S. Bhangale</h4>
-                        <p className="text-slate-600 text-sm mb-1">University of Washington</p>
-                        <p className="text-slate-500 text-xs">Questions about the PySINDy package and releases</p>
-                      </div>
-
-                      {/* Contact Links */}
-                      <div className="flex gap-2 ml-4">
-                        <a 
-                          href="mailto:yash6599@uw.edu" 
-                          className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
-                          title="Email Yash"
-                        >
-                          <svg className="w-4 h-4 text-slate-600 group-hover:text-slate-800" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
-                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
-                          </svg>
-                        </a>
-                        <a 
-                          href="https://github.com" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
-                          title="GitHub Profile"
-                        >
-                          <Github className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
           {/* Community Section */}
           <section id="community" className="space-y-8">
             <div className="text-center space-y-4">
@@ -1084,9 +988,105 @@ print("📈 Check the plots to see how well SINDy discovered the equations!")`}<
                     >
                       Contributing Guide →
                     </a>
-                  </div>                </div>
+                  </div>                
+                </div>
               </div>
             </div>
+                      
+        {/* Contact Section */}
+          <section id="contact" className="space-y-4">
+            {/* Contact Card - Jake */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-slate-900">Contact</h3>
+              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50">
+                <div className="flex items-center gap-6">
+                  {/* Profile Image */}
+                  <div className="w-16 h-16 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
+                    <span className="text-white text-lg font-bold">JS</span>
+                  </div>
+
+                  {/* Contact Info */}
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="text-lg font-bold text-slate-900">Dr. Jake Stevens-Haas</h4>
+                        <p className="text-slate-600 text-sm mb-1">University of Washington</p>
+                      </div>
+
+                      {/* Contact Links */}
+                      <div className="flex gap-2 ml-4">
+                        <a 
+                          href="mailto:jacob.stevens.haas@gmail.com" 
+                          className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
+                          title="Email Dr. Jacob"
+                        >
+                          <svg className="w-4 h-4 text-slate-600 group-hover:text-slate-800" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                          </svg>
+                        </a>
+                        <a 
+                          href="https://github.com" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
+                          title="GitHub Profile"
+                        >
+                          <Github className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Card - Yash */}
+            <div className="space-y-2">
+              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50">
+                <div className="flex items-center gap-6">
+                  {/* Profile Image */}
+                  <div className="w-16 h-16 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center shadow-lg flex-shrink-0">
+                    <span className="text-white text-lg font-bold">YB</span>
+                  </div>
+
+                  {/* Contact Info */}
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <h4 className="text-lg font-bold text-slate-900">Yash S. Bhangale</h4>
+                        <p className="text-slate-600 text-sm mb-1">University of Washington</p>
+                      </div>
+
+                      {/* Contact Links */}
+                      <div className="flex gap-2 ml-4">
+                        <a 
+                          href="mailto:yash6599@uw.edu" 
+                          className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
+                          title="Email Yash"
+                        >
+                          <svg className="w-4 h-4 text-slate-600 group-hover:text-slate-800" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                          </svg>
+                        </a>
+                        <a 
+                          href="https://github.com" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
+                          title="GitHub Profile"
+                        >
+                          <Github className="w-4 h-4 text-slate-600 group-hover:text-slate-800" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
           </section>
 
           </main>

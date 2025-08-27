@@ -1,12 +1,14 @@
 "use client"
 import React, { useState } from 'react';
-import { Zap, ChevronDown, ChevronRight, Download, Github, Book, Users, CheckCircle, AlertCircle, Code, Terminal, Lightbulb, Rocket, Star, ArrowRight, BarChart3, Shield, Cpu, TrendingUp, GitBranch, ExternalLink, Mail, Linkedin, GraduationCap, FlaskConical, Activity, Shuffle } from 'lucide-react';
+import { Zap, Copy, Check, ChevronDown, ChevronRight, Download, Github, Book, Users, CheckCircle, AlertCircle, Code, Terminal, Lightbulb, Rocket, Star, ArrowRight, BarChart3, Shield, Cpu, TrendingUp, GitBranch, ExternalLink, Mail, Linkedin, GraduationCap, FlaskConical, Activity, Shuffle } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 export default function EnsembleSINDyPage() {
   const [expandedFAQ, setExpandedFAQ] = useState(null);
   const [selectedTab, setSelectedTab] = useState('overview');
+  const [copiedBibtex, setCopiedBibtex] = useState<{[key: string]: boolean}>({});
+  
 
   const faqItems = [
     {
@@ -106,6 +108,26 @@ export default function EnsembleSINDyPage() {
                   <Github className="w-4 h-4" />
                   <span className="text-sm font-medium">View on GitHub</span>
                 </a>
+              </div>
+            </div>
+
+            {/* SINDy Methodology Figure */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/50 shadow-lg">
+              <h2 className="text-2xl font-semibold text-slate-900 text-center mb-8">Ensembling Overview</h2>
+              
+              <div className="flex justify-center">
+                <img 
+                  src="/ensemble-sindy-workflow.jpg" 
+                  alt="SINDy Methodology: From Lorenz System Data to Sparse Identification" 
+                  className="max-w-full h-auto rounded-lg shadow-md border border-slate-200"
+                  style={{ maxHeight: '600px' }}
+                />
+              </div>
+              
+              <div className="mt-6 text-center">
+                <p className="text-sm text-slate-600 max-w-4xl mx-auto leading-relaxed">
+                  <strong>Figure:</strong> The SINDy algorithm discovers governing equations from data. 
+E-SINDy leverages bootstrap aggregating (bagging) to identify ordinary and partial differential equations underlying noisy data. Sparse regression is applied to resampled datasets (or library terms in the case of library bagging) to generate an ensemble of SINDy models. The mean or median of the coefficients is then computed, low-probability terms are thresholded, and the results are aggregated into a final E-SINDy model for forecasting.                </p>
               </div>
             </div>
 
@@ -270,55 +292,90 @@ export default function EnsembleSINDyPage() {
             </div>
           </section>
 
-          {/* Code Example Section */}
-          <section className="space-y-8">
-            <div className="text-center space-y-4">
-              <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-medium">
-                <Code className="h-4 w-4" />
-                Quick Start
-              </div>
-              <h2 className="text-4xl font-bold text-slate-900">Example: Lorenz System with Uncertainty</h2>
-              <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
-                Discover the Lorenz equations with quantified uncertainty using ensemble methods
-              </p>
-            </div>
+{/* Ensemble SINDy Tutorial */}
+<section id="ensemble-sindy" className="space-y-8">
+  <div className="text-center space-y-4">
+    <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-800 px-4 py-2 rounded-full text-sm font-medium">
+      <Code className="h-4 w-4" />
+      Quick Start
+    </div>
+    <h2 className="text-4xl font-bold text-slate-900">Lorenz System with Uncertainty</h2>
+    <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
+      Learn how Ensemble SINDy discovers equations while quantifying uncertainty through bootstrapping.
+    </p>
+  </div>
 
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
-              <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
-                <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
-                  <span className="text-slate-300 font-mono text-sm flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                    <span className="ml-2">ensemble_lorenz.py</span>
-                  </span>
-                  <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
-                    Copy
-                  </button>
-                </div>
-                
-                <pre className="text-sm text-slate-300 overflow-x-auto p-6 bg-slate-900 font-mono leading-relaxed">
-<code>{`import numpy as np
+  <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
+    <div className="space-y-8">
+
+      {/* Step 1: Import & Setup */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 bg-purple-600 text-white rounded-lg flex items-center justify-center text-sm font-bold">1</div>
+          <h3 className="text-xl font-semibold text-slate-900">Import Libraries & Setup</h3>
+        </div>
+        <p className="text-slate-600 mb-4">
+          We’ll use pySINDy with polynomial features, STLSQ optimizer, and bootstrap resampling.
+        </p>
+        <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
+          <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
+            <span className="text-slate-300 font-mono text-sm flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span className="ml-2">Step 1: Import Libraries</span>
+            </span>
+            <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
+              Copy
+            </button>
+          </div>
+<pre className="text-sm text-slate-300 overflow-x-auto p-6 bg-slate-900 font-mono leading-relaxed">
+{`import numpy as np
 import matplotlib.pyplot as plt
+from scipy.integrate import solve_ivp
 from pysindy import SINDy
 from pysindy.feature_library import PolynomialLibrary
 from pysindy.optimizers import STLSQ
 from sklearn.utils import resample
 
-# Generate noisy Lorenz data
-def lorenz(t, x, sigma=10, beta=8/3, rho=28):
-    return [
-        sigma * (x[1] - x[0]),
-        x[0] * (rho - x[2]) - x[1],
-        x[0] * x[1] - beta * x[2]
-    ]
+np.random.seed(42)
+print("✅ Libraries imported successfully!")`}
+</pre>
+        </div>
+      </div>
 
-# Create synthetic data with noise
+      {/* Step 2: Generate Noisy Data */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center text-sm font-bold">2</div>
+          <h3 className="text-xl font-semibold text-slate-900">Generate Noisy Training Data</h3>
+        </div>
+        <p className="text-slate-600 mb-4">
+          Create synthetic Lorenz data and add measurement noise to mimic real-world conditions.
+        </p>
+        <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
+          <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
+            <span className="text-slate-300 font-mono text-sm flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span className="ml-2">Step 2: Generate Data</span>
+            </span>
+            <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
+              Copy
+            </button>
+          </div>
+<pre className="text-sm text-slate-300 overflow-x-auto p-6 bg-slate-900 font-mono leading-relaxed">
+{`# Lorenz system
+def lorenz(t, x, sigma=10, beta=8/3, rho=28):
+    return [sigma*(x[1]-x[0]),
+            x[0]*(rho-x[2]) - x[1],
+            x[0]*x[1] - beta*x[2]]
+
 dt = 0.002
 t = np.arange(0, 10, dt)
 x0 = [-8, 8, 27]
 
-from scipy.integrate import solve_ivp
 sol = solve_ivp(lorenz, [0, 10], x0, t_eval=t)
 X = sol.y.T
 
@@ -326,95 +383,158 @@ X = sol.y.T
 noise_level = 0.01
 X_noisy = X + noise_level * np.random.randn(*X.shape)
 
-# Ensemble SINDy
-n_models = 100
-n_subset = int(0.8 * len(X_noisy))  # Use 80% of data for each model
-models = []
+print(f"✅ Generated noisy data: {X_noisy.shape}")`}
+</pre>
+        </div>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h4 className="font-semibold text-blue-900 mb-2">💡 What's Happening?</h4>
+          <ul className="text-blue-800 text-sm space-y-1">
+            <li>• Define Lorenz dynamics</li>
+            <li>• Integrate to create trajectories</li>
+            <li>• Add noise to simulate measurements</li>
+          </ul>
+        </div>
+      </div>
+
+      {/* Step 3: Fit Ensemble Models */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 bg-green-600 text-white rounded-lg flex items-center justify-center text-sm font-bold">3</div>
+          <h3 className="text-xl font-semibold text-slate-900">Fit Ensemble of SINDy Models</h3>
+        </div>
+        <p className="text-slate-600 mb-4">
+          Use bootstrap resampling to fit many SINDy models on subsets of data, capturing variability.
+        </p>
+        <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
+          <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
+            <span className="text-slate-300 font-mono text-sm flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span className="ml-2">Step 3: Ensemble Models</span>
+            </span>
+            <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
+              Copy
+            </button>
+          </div>
+<pre className="text-sm text-slate-300 overflow-x-auto p-6 bg-slate-900 font-mono leading-relaxed">
+{`n_models = 100
+n_subset = int(0.8 * len(X_noisy))
 coefficients = []
 
 for i in range(n_models):
-    # Bootstrap sample
     idx = resample(np.arange(len(X_noisy)), n_samples=n_subset)
     X_train = X_noisy[idx]
-    
-    # Fit SINDy model
+
     model = SINDy(
         feature_library=PolynomialLibrary(degree=2),
         optimizer=STLSQ(threshold=0.1),
-        feature_names=['x', 'y', 'z']
+        feature_names=['x','y','z']
     )
     model.fit(X_train, t=dt)
-    
-    models.append(model)
     coefficients.append(model.coefficients())
 
-# Aggregate results
 coefficients = np.array(coefficients)
-mean_coefficients = np.mean(coefficients, axis=0)
-std_coefficients = np.std(coefficients, axis=0)
+mean_coeffs = np.mean(coefficients, axis=0)
+std_coeffs = np.std(coefficients, axis=0)
 
-# Print discovered equations with uncertainty
+print("✅ Ensemble training complete!")`}
+</pre>
+        </div>
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <h4 className="font-semibold text-green-900 mb-2">🎯 Expected Output:</h4>
+          <div className="font-mono text-sm text-green-800 bg-green-100 p-3 rounded">
+            <div>x' = -10.002±0.021 x + 10.001±0.018 y</div>
+            <div>y' = 27.983±0.043 x - 0.998±0.025 y - 1.001±0.008 xz</div>
+            <div>z' = -2.667±0.012 z + 0.999±0.007 xy</div>
+          </div>
+          <p className="text-green-700 text-sm mt-2">
+            Coefficients are reported with ± one standard deviation.
+          </p>
+        </div>
+      </div>
+
+      {/* Step 4: Visualize Uncertainty */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 bg-orange-600 text-white rounded-lg flex items-center justify-center text-sm font-bold">4</div>
+          <h3 className="text-xl font-semibold text-slate-900">Visualize Coefficient Distributions</h3>
+        </div>
+        <p className="text-slate-600 mb-4">
+          Plot histograms of discovered coefficients across the ensemble to see uncertainty.
+        </p>
+        <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700">
+          <div className="flex items-center justify-between px-6 py-3 bg-slate-800 border-b border-slate-700">
+            <span className="text-slate-300 font-mono text-sm flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-red-500"></div>
+              <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+              <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              <span className="ml-2">Step 4: Visualization</span>
+            </span>
+            <button className="text-slate-400 hover:text-white text-xs px-2 py-1 rounded hover:bg-slate-700 transition-colors">
+              Copy
+            </button>
+          </div>
+<pre className="text-sm text-slate-300 overflow-x-auto p-6 bg-slate-900 font-mono leading-relaxed">
+{`fig, axes = plt.subplots(3, 3, figsize=(12, 10))
 feature_names = model.get_feature_names()
-for i, name in enumerate(['x', 'y', 'z']):
-    print(f"\\n{name}' = ", end="")
-    for j, feature in enumerate(feature_names):
-        if abs(mean_coefficients[i, j]) > 0.01:
-            print(f"{mean_coefficients[i, j]:.3f}±{std_coefficients[i, j]:.3f} {feature} + ", end="")
 
-# Visualize coefficient distributions
-fig, axes = plt.subplots(3, 3, figsize=(12, 10))
 for i in range(3):
     for j in range(min(9, len(feature_names))):
         ax = axes[i, j % 3]
         ax.hist(coefficients[:, i, j], bins=30, alpha=0.7, color='purple')
-        ax.axvline(mean_coefficients[i, j], color='red', linestyle='--', label='Mean')
+        ax.axvline(mean_coeffs[i, j], color='red', linestyle='--', label='Mean')
         ax.set_title(f"Coeff of {feature_names[j]} in eq. {i+1}")
-        ax.set_xlabel('Coefficient value')
-        ax.set_ylabel('Frequency')
+        ax.legend()
+
 plt.tight_layout()
-plt.show()`}</code>
-                </pre>
-              </div>
+plt.show()`}
+</pre>
+        </div>
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+          <h4 className="font-semibold text-orange-900 mb-2">📊 What to Look For:</h4>
+          <ul className="text-orange-800 text-sm space-y-1">
+            <li>• Histograms show variability in coefficients</li>
+            <li>• Red dashed lines mark ensemble means</li>
+            <li>• Narrow distributions = confident estimates</li>
+          </ul>
+        </div>
+      </div>
 
-              <div className="mt-8 grid md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-slate-900">Key Features Demonstrated:</h4>
-                  <ul className="space-y-2 text-sm text-slate-600">
-                    <li className="flex items-start space-x-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Bootstrap resampling for ensemble generation</span>
-                    </li>
-                    <li className="flex items-start space-x-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Coefficient averaging across models</span>
-                    </li>
-                    <li className="flex items-start space-x-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Uncertainty quantification via standard deviation</span>
-                    </li>
-                    <li className="flex items-start space-x-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Visualization of coefficient distributions</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-slate-900">Expected Output:</h4>
-                  <div className="bg-slate-50 p-4 rounded-lg">
-                    <pre className="text-sm font-mono text-slate-700">
-{`x' = -10.002±0.021 x + 10.001±0.018 y
-y' = 27.983±0.043 x - 0.998±0.025 y - 1.001±0.008 xz
-z' = -2.667±0.012 z + 0.999±0.007 xy`}
-                    </pre>
-                  </div>
-                  <p className="text-xs text-slate-600">
-                    Note: The ± values represent one standard deviation of uncertainty
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
+      {/* Summary */}
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-6">
+        <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
+          <CheckCircle className="w-5 h-5 text-purple-600" />
+          🎉 Congratulations!
+        </h4>
+        <p className="text-slate-700 mb-4">
+          You’ve applied Ensemble SINDy to discover the Lorenz equations with quantified uncertainty. 
+          Bootstrapping provides confidence intervals around coefficients, making the results more robust.
+        </p>
+        <div className="grid md:grid-cols-2 gap-4 text-sm">
+          <div>
+            <h5 className="font-semibold text-slate-900 mb-2">🎯 What You Learned:</h5>
+            <ul className="text-slate-700 space-y-1">
+              <li>• How to build an ensemble of SINDy models</li>
+              <li>• Quantify uncertainty with coefficient variance</li>
+              <li>• Visualize parameter distributions</li>
+              <li>• Interpret confidence intervals in dynamics</li>
+            </ul>
+          </div>
+          <div>
+            <h5 className="font-semibold text-slate-900 mb-2">🚀 Next Steps:</h5>
+            <ul className="text-slate-700 space-y-1">
+              <li>• Experiment with different noise levels</li>
+              <li>• Try other optimizers (e.g., Lasso)</li>
+              <li>• Apply ensemble methods to real data</li>
+              <li>• Compare with single-model SINDy</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
           {/* Advanced Features Section */}
           <section className="space-y-8">
@@ -576,160 +696,182 @@ z' = -2.667±0.012 z + 0.999±0.007 xy`}
             </div>
           </section>
 
-          {/* Results Visualization Section */}
-          <section className="space-y-8">
-            <div className="text-center space-y-4">
-              <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
-                <BarChart3 className="h-4 w-4" />
-                Results & Visualization
-              </div>
-              <h2 className="text-4xl font-bold text-slate-900">Visualizing Ensemble Results</h2>
-              <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
-                Comprehensive visualization of uncertainty and model consensus
-              </p>
-            </div>
+{/* Results Visualization Section */}
+<section className="space-y-8">
+  <div className="text-center space-y-4">
+    <div className="inline-flex items-center gap-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
+      <BarChart3 className="h-4 w-4" />
+      Results & Visualization
+    </div>
+    <h2 className="text-4xl font-bold text-slate-900">Visualizing Ensemble Results</h2>
+    <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
+      Comprehensive visualization of uncertainty and model consensus
+    </p>
+  </div>
 
-            <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-purple-200/50">
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Coefficient Distribution Plot */}
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-slate-900">Coefficient Distributions</h4>
-                  <div className="bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg p-6 h-64 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="flex justify-center gap-2 mb-4">
-                        <div className="w-8 h-24 bg-purple-500 rounded"></div>
-                        <div className="w-8 h-32 bg-purple-600 rounded"></div>
-                        <div className="w-8 h-28 bg-indigo-500 rounded"></div>
-                        <div className="w-8 h-20 bg-indigo-600 rounded"></div>
-                        <div className="w-8 h-36 bg-pink-500 rounded"></div>
-                      </div>
-                      <p className="text-sm text-slate-600">Histogram of coefficient values across ensemble</p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-slate-600">
-                    Visualize the distribution of each coefficient across all bootstrap models to assess uncertainty and identify robust terms.
-                  </p>
-                </div>
+  <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-purple-200/50">
+    <div className="grid md:grid-cols-2 gap-6">
+      {/* Coefficient Distribution Plot */}
+      <div className="space-y-3">
+        <h4 className="font-semibold text-slate-900">Coefficient Distributions</h4>
+        <div className="bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg p-6 h-64 flex items-center justify-center">
+          <img 
+            src="/uncertainty-quantification-results.jpg" 
+            alt="Coefficient distribution plot" 
+            className="max-h-full max-w-full object-contain rounded-lg"
+          />
+        </div>
+        <p className="text-sm text-slate-600">
+          Visualize the distribution of each coefficient across all bootstrap models to assess uncertainty and identify robust terms.
+        </p>
+      </div>
 
-                {/* Inclusion Probability Plot */}
-                <div className="space-y-3">
-                  <h4 className="font-semibold text-slate-900">Inclusion Probability</h4>
-                  <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg p-6 h-64 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs w-8">x²:</span>
-                          <div className="flex-1 bg-green-200 rounded">
-                            <div className="bg-green-500 h-4 rounded" style={{width: '95%'}}></div>
-                          </div>
-                          <span className="text-xs">95%</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs w-8">xy:</span>
-                          <div className="flex-1 bg-green-200 rounded">
-                            <div className="bg-green-500 h-4 rounded" style={{width: '88%'}}></div>
-                          </div>
-                          <span className="text-xs">88%</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs w-8">x³:</span>
-                          <div className="flex-1 bg-green-200 rounded">
-                            <div className="bg-yellow-500 h-4 rounded" style={{width: '12%'}}></div>
-                          </div>
-                          <span className="text-xs">12%</span>
-                        </div>
-                      </div>
-                      <p className="text-sm text-slate-600 mt-4">Frequency of term selection</p>
-                    </div>
-                  </div>
-                  <p className="text-sm text-slate-600">
-                    Shows how often each candidate term appears in the ensemble models, helping identify stable features.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
+      {/* Inclusion Probability Plot */}
+      <div className="space-y-3">
+        <h4 className="font-semibold text-slate-900">Inclusion Probability</h4>
+        <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg p-6 h-64 flex items-center justify-center">
+          <img 
+            src="/ensemble-bagging-methods.jpg" 
+            alt="Inclusion probability plot" 
+            className="max-h-full max-w-full object-contain rounded-lg"
+          />
+        </div>
+        <p className="text-sm text-slate-600">
+          Shows how often each candidate term appears in the ensemble models, helping identify stable features.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
 
-          {/* Publications Section */}
-          <section className="space-y-8">
-            <div className="text-center space-y-4">
-              <div className="inline-flex items-center gap-2 bg-slate-100 text-slate-800 px-4 py-2 rounded-full text-sm font-medium">
-                <Book className="h-4 w-4" />
-                Publications
-              </div>
-              <h2 className="text-4xl font-bold text-slate-900">Research & References</h2>
-              <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
-                Key publications on Ensemble SINDy methodology
-              </p>
-            </div>
+{/* Publications Section */}
+<section className="space-y-8">
+  <div className="text-center space-y-4">
+    <div className="inline-flex items-center gap-2 bg-slate-100 text-slate-800 px-4 py-2 rounded-full text-sm font-medium">
+      <Book className="h-4 w-4" />
+      Publications
+    </div>
+    <h2 className="text-4xl font-bold text-slate-900">Research & References</h2>
+    <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
+      Key publications on Ensemble SINDy methodology
+    </p>
+  </div>
 
-            <div className="space-y-4">
-              {/* Main Paper */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50 hover:shadow-lg transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                      Ensemble-SINDy: Robust sparse model discovery in the low-data, high-noise limit, with active learning and control
-                    </h3>
-                    <p className="text-sm text-slate-600 mb-3">
-                      Urban Fasel, J. Nathan Kutz, Bingni W. Brunton, Steven L. Brunton
-                    </p>
-                    <p className="text-sm text-slate-500 mb-4">
-                      Proceedings of the Royal Society A, 2022
-                    </p>
-                    <div className="flex gap-3">
-                      <a href="https://royalsocietypublishing.org/doi/10.1098/rspa.2021.0904" 
-                         target="_blank" 
-                         rel="noopener noreferrer"
-                         className="inline-flex items-center gap-1 text-purple-600 hover:text-purple-700 text-sm font-medium">
-                        <Book className="w-3 h-3" />
-                        Journal
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                      <a href="https://arxiv.org/abs/2111.10992" 
-                         target="_blank" 
-                         rel="noopener noreferrer"
-                         className="inline-flex items-center gap-1 text-purple-600 hover:text-purple-700 text-sm font-medium">
-                        <GraduationCap className="w-3 h-3" />
-                        arXiv
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
-                    </div>
-                  </div>
-                  <div className="ml-4 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
-                    2022
-                  </div>
-                </div>
-              </div>
+  <div className="space-y-4">
+    {/* Main Ensemble-SINDy Paper */}
+    <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50 hover:shadow-lg transition-shadow">
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">
+            Ensemble-SINDy: Robust sparse model discovery in the low-data, high-noise limit, with active learning and control
+          </h3>
+          <p className="text-sm text-slate-600 mb-3">
+            Urban Fasel, J. Nathan Kutz, Bingni W. Brunton, Steven L. Brunton
+          </p>
+          <p className="text-sm text-slate-500 mb-4">
+            Proceedings of the Royal Society A, 2022
+          </p>
+          <div className="flex gap-3">
+            <a href="https://royalsocietypublishing.org/doi/10.1098/rspa.2021.0904" target="_blank" rel="noopener noreferrer"
+               className="inline-flex items-center gap-1 text-purple-600 hover:text-purple-700 text-sm font-medium">
+              <Book className="w-3 h-3" /> Journal <ExternalLink className="w-3 h-3" />
+            </a>
+            <a href="https://arxiv.org/abs/2111.10992" target="_blank" rel="noopener noreferrer"
+               className="inline-flex items-center gap-1 text-purple-600 hover:text-purple-700 text-sm font-medium">
+              <GraduationCap className="w-3 h-3" /> arXiv <ExternalLink className="w-3 h-3" />
+            </a>
+          </div>
+        </div>
 
-              {/* Related Papers */}
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50">
-                  <h4 className="font-semibold text-slate-900 mb-2">
-                    SINDy with Control
-                  </h4>
-                  <p className="text-sm text-slate-600 mb-3">
-                    Brunton, Proctor, Kutz (2016) - Sparse identification of nonlinear dynamics with control (SINDYc)
-                  </p>
-                  <a href="#" className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
-                    Read more →
-                  </a>
-                </div>
+        <div className="ml-4 flex flex-col gap-2 items-end">
+          <div className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">2022</div>
+          <button
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(`@article{fasel2022ensemble,
+  title={Ensemble-SINDy: Robust sparse model discovery in the low-data, high-noise limit, with active learning and control},
+  author={Fasel, Urban and Kutz, J. Nathan and Brunton, Bingni W. and Brunton, Steven L.},
+  journal={Proceedings of the Royal Society A},
+  year={2022}
+}`);
+                setCopiedBibtex(prev => ({ ...prev, ['ensembleSindy2022']: true }));
+                setTimeout(() => setCopiedBibtex(prev => ({ ...prev, ['ensembleSindy2022']: false })), 2000);
+              } catch (err) {
+                console.error('Failed to copy bibtex:', err);
+              }
+            }}
+            className="px-2 py-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded transition-colors flex items-center gap-1"
+          >
+            {copiedBibtex['ensembleSindy2022'] ? (
+              <>
+                <Check className="w-3 h-3" /> Copied
+              </>
+            ) : (
+              <>
+                <Copy className="w-3 h-3" /> BibTeX
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </div>
 
-                <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50">
-                  <h4 className="font-semibold text-slate-900 mb-2">
-                    Original SINDy
-                  </h4>
-                  <p className="text-sm text-slate-600 mb-3">
-                    Brunton, Proctor, Kutz (2016) - Discovering governing equations from data by sparse identification
-                  </p>
-                  <a href="#" className="text-pink-600 hover:text-pink-700 text-sm font-medium">
-                    Read more →
-                  </a>
-                </div>
-              </div>
-            </div>
-          </section>
+    {/* Original SINDy + SINDy with Control Side by Side */}
+    <div className="grid md:grid-cols-2 gap-4">
+      {/* Original SINDy */}
+      <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50 hover:shadow-lg transition-shadow">
+        <h4 className="font-semibold text-slate-900 mb-2">Original SINDy</h4>
+        <p className="text-sm text-slate-600 mb-3">Brunton, Proctor, Kutz (2016) - Discovering governing equations from data by sparse identification</p>
+        <a href="#" className="text-pink-600 hover:text-pink-700 text-sm font-medium">Read more →</a>
+        <button
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(`@article{brunton2016discovering,
+  title={Discovering governing equations from data by sparse identification of nonlinear dynamical systems},
+  author={Brunton, Steven L and Proctor, Joshua L and Kutz, J Nathan},
+  journal={Proceedings of the National Academy of Sciences},
+  year={2016}
+}`);
+              setCopiedBibtex(prev => ({ ...prev, ['originalSindy2016']: true }));
+              setTimeout(() => setCopiedBibtex(prev => ({ ...prev, ['originalSindy2016']: false })), 2000);
+            } catch (err) {
+              console.error('Failed to copy bibtex:', err);
+            }
+          }}
+          className="mt-2 px-2 py-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded transition-colors flex items-center gap-1"
+        >
+          {copiedBibtex['originalSindy2016'] ? <><Check className="w-3 h-3" /> Copied</> : <><Copy className="w-3 h-3" /> BibTeX</>}
+        </button>
+      </div>
+
+      {/* SINDy with Control */}
+      <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50 hover:shadow-lg transition-shadow">
+        <h4 className="font-semibold text-slate-900 mb-2">SINDy with Control</h4>
+        <p className="text-sm text-slate-600 mb-3">Kaiser, Kutz, Proctor (2018) - Sparse identification of nonlinear dynamics for model predictive control in the low-data limit (SINDYc)</p>
+        <a href="https://arxiv.org/abs/1711.05501" target="_blank" rel="noopener noreferrer" className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">Read more →</a>
+        <button
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(`@article{kaiser2018sindyc,
+  title={Sparse identification of nonlinear dynamics for model predictive control in the low-data limit (SINDYc)},
+  author={Kaiser, Kutz, Proctor},
+  journal={arXiv preprint arXiv:1711.05501},
+  year={2018}
+}`);
+              setCopiedBibtex(prev => ({ ...prev, ['sindyControl2018']: true }));
+              setTimeout(() => setCopiedBibtex(prev => ({ ...prev, ['sindyControl2018']: false })), 2000);
+            } catch (err) {
+              console.error('Failed to copy bibtex:', err);
+            }
+          }}
+          className="mt-2 px-2 py-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded transition-colors flex items-center gap-1"
+        >
+          {copiedBibtex['sindyControl2018'] ? <><Check className="w-3 h-3" /> Copied</> : <><Copy className="w-3 h-3" /> BibTeX</>}
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
 
           {/* FAQ Section */}
           <section className="space-y-8">

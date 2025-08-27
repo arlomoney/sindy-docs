@@ -29,9 +29,214 @@ export default function HomePage() {
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [animationData, setAnimationData] = useState<DemoData[]>([]);
   const [copiedStates, setCopiedStates] = useState<CopiedStates>({});
+  const [copiedBibtex, setCopiedBibtex] = useState<{[key: string]: boolean}>({});
   const [currentStep, setCurrentStep] = useState<number>(0);
+  const [noiseLevel, setNoiseLevel] = useState<number>(0.05);
+  const [threshold, setThreshold] = useState<number>(0.1);
+  const [discoveredEquations, setDiscoveredEquations] = useState<{clean: string[], noisy: string[]}>({clean: [], noisy: []});
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
+
+  // Real SINDy implementation
+  const [sindyData, setSindyData] = useState<{X: number[][], Xdot: number[][], equations: string[], step: number}>({
+    X: [], Xdot: [], equations: [], step: 0
+  });
+
+  // Build polynomial library matrix
+  const buildPolynomialLibrary = useCallback((X: number[][], degree: number = 2): { Theta: number[][], features: string[] } => {
+    if (X.length === 0) return { Theta: [], features: [] };
+    
+    const n = X.length; // number of samples
+    const d = X[0].length; // number of variables
+    
+    // Feature names for up to 3 variables
+    const varNames = ['x', 'y', 'z'];
+    const features: string[] = [];
+    const Theta: number[][] = [];
+    
+    // Initialize each row
+    for (let i = 0; i < n; i++) {
+      Theta[i] = [];
+    }
+    
+    // Constant term (optional)
+    features.push('1');
+    for (let i = 0; i < n; i++) {
+      Theta[i].push(1);
+    }
+    
+    // Linear terms
+    for (let j = 0; j < d; j++) {
+      features.push(varNames[j] || `x${j}`);
+      for (let i = 0; i < n; i++) {
+        Theta[i].push(X[i][j]);
+      }
+    }
+    
+    // Quadratic terms
+    if (degree >= 2) {
+      for (let j1 = 0; j1 < d; j1++) {
+        for (let j2 = j1; j2 < d; j2++) {
+          const fname = j1 === j2 ? 
+            `${varNames[j1] || `x${j1}`}²` : 
+            `${varNames[j1] || `x${j1}`}${varNames[j2] || `x${j2}`}`;
+          features.push(fname);
+          for (let i = 0; i < n; i++) {
+            Theta[i].push(X[i][j1] * X[i][j2]);
+          }
+        }
+      }
+    }
+    
+    return { Theta, features };
+  }, []);
+
+  // Sequential Thresholded Least Squares (STLSQ)
+  const stlsq = useCallback((Theta: number[][], Xdot: number[][], threshold: number): number[][] => {
+    if (Theta.length === 0 || Xdot.length === 0) return [];
+    
+    const m = Theta[0].length; // features
+    const n = Xdot[0].length; // variables
+    
+    // Solve normal equations: (Theta^T * Theta) * Xi = Theta^T * Xdot
+    const ThetaT: number[][] = Array(m).fill(0).map(() => Array(Theta.length).fill(0));
+    for (let i = 0; i < m; i++) {
+      for (let j = 0; j < Theta.length; j++) {
+        ThetaT[i][j] = Theta[j][i];
+      }
+    }
+    
+    // Theta^T * Theta
+    const AtA: number[][] = Array(m).fill(0).map(() => Array(m).fill(0));
+    for (let i = 0; i < m; i++) {
+      for (let j = 0; j < m; j++) {
+        for (let k = 0; k < Theta.length; k++) {
+          AtA[i][j] += ThetaT[i][k] * Theta[k][j];
+        }
+      }
+    }
+    
+    // Theta^T * Xdot
+    const AtB: number[][] = Array(m).fill(0).map(() => Array(n).fill(0));
+    for (let i = 0; i < m; i++) {
+      for (let j = 0; j < n; j++) {
+        for (let k = 0; k < Theta.length; k++) {
+          AtB[i][j] += ThetaT[i][k] * Xdot[k][j];
+        }
+      }
+    }
+    
+    // Simple matrix inversion for small matrices (not numerically stable for large matrices)
+    const Xi: number[][] = Array(m).fill(0).map(() => Array(n).fill(0));
+    
+    // For each variable
+    for (let col = 0; col < n; col++) {
+      // Solve AtA * xi = AtB[:, col] using Gaussian elimination
+      const augmented: number[][] = AtA.map((row, i) => [...row, AtB[i][col]]);
+      
+      // Forward elimination
+      for (let i = 0; i < m; i++) {
+        // Find pivot
+        let maxRow = i;
+        for (let k = i + 1; k < m; k++) {
+          if (Math.abs(augmented[k][i]) > Math.abs(augmented[maxRow][i])) {
+            maxRow = k;
+          }
+        }
+        [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
+        
+        // Make all rows below this one 0 in current column
+        for (let k = i + 1; k < m; k++) {
+          if (Math.abs(augmented[i][i]) < 1e-10) continue;
+          const c = augmented[k][i] / augmented[i][i];
+          for (let j = i; j <= m; j++) {
+            augmented[k][j] -= c * augmented[i][j];
+          }
+        }
+      }
+      
+      // Back substitution
+      for (let i = m - 1; i >= 0; i--) {
+        if (Math.abs(augmented[i][i]) < 1e-10) {
+          Xi[i][col] = 0;
+          continue;
+        }
+        Xi[i][col] = augmented[i][m];
+        for (let j = i + 1; j < m; j++) {
+          Xi[i][col] -= augmented[i][j] * Xi[j][col];
+        }
+        Xi[i][col] /= augmented[i][i];
+      }
+    }
+    
+    // Apply thresholding iteratively
+    for (let iter = 0; iter < 10; iter++) {
+      let changed = false;
+      for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+          if (Math.abs(Xi[i][j]) < threshold) {
+            if (Xi[i][j] !== 0) changed = true;
+            Xi[i][j] = 0;
+          }
+        }
+      }
+      if (!changed) break;
+    }
+    
+    return Xi;
+  }, []);
+
+  // Convert coefficients to equation strings
+  const coefficientsToEquations = useCallback((Xi: number[][], features: string[], system: string): string[] => {
+    if (Xi.length === 0) return [];
+    
+    const varNames = system === 'lorenz' ? ['x', 'y', 'z'] : 
+                    system === 'lotka' ? ['x', 'y'] : ['x', 'y'];
+    const equations: string[] = [];
+    
+    for (let eqIdx = 0; eqIdx < Xi[0].length; eqIdx++) {
+      let equation = `d${varNames[eqIdx]}/dt = `;
+      const terms: string[] = [];
+      
+      for (let featIdx = 0; featIdx < features.length; featIdx++) {
+        const coeff = Xi[featIdx][eqIdx];
+        if (Math.abs(coeff) < 1e-6) continue;
+        
+        let term = '';
+        const absCoeff = Math.abs(coeff);
+        const sign = coeff > 0 ? '+' : '-';
+        
+        if (features[featIdx] === '1') {
+          term = `${sign}${absCoeff.toFixed(3)}`;
+        } else if (Math.abs(absCoeff - 1) < 1e-6) {
+          term = `${sign}${features[featIdx]}`;
+        } else {
+          term = `${sign}${absCoeff.toFixed(3)}${features[featIdx]}`;
+        }
+        
+        terms.push(term);
+      }
+      
+      if (terms.length === 0) {
+        equation += '0';
+      } else {
+        equation += terms.join(' ').replace(/^\+/, '').replace(/\s\+\s/g, ' + ').replace(/\s\-\s/g, ' - ');
+      }
+      
+      equations.push(equation);
+    }
+    
+    return equations;
+  }, []);
+
+  // Run SINDy on current data
+  const runSINDyAnalysis = useCallback((X: number[][], Xdot: number[][], system: string, threshold: number): string[] => {
+    if (X.length < 20) return []; // Need minimum data
+    
+    const { Theta, features } = buildPolynomialLibrary(X, 2);
+    const Xi = stlsq(Theta, Xdot, threshold);
+    return coefficientsToEquations(Xi, features, system);
+  }, [buildPolynomialLibrary, stlsq, coefficientsToEquations]);
   
   // Demo simulation logic
   const demoOptions = [
@@ -271,9 +476,13 @@ public:
   };
 
   // Improved simulation functions for demo
-  const generateDemoData = useCallback((systemType: string, steps: number = 2000): DemoData[] => {
+  const generateDemoData = useCallback((systemType: string, steps: number = 1000): DemoData[] => {
     const data: DemoData[] = [];
     const dt = 0.01;
+    
+    // Store data and derivatives for SINDy
+    const X: number[][] = [];
+    const Xdot: number[][] = [];
     
     if (systemType === 'lorenz') {
       let x = -8, y = 8, z = 27;
@@ -284,11 +493,25 @@ public:
         const dy = x * (rho - z) - y;
         const dz = x * y - beta * z;
         
-        x += dx * dt;
-        y += dy * dt;
-        z += dz * dt;
+        // Store clean state and derivatives
+        X.push([x, y, z]);
+        Xdot.push([dx, dy, dz]);
         
-        data.push({ x, y, z, step: i });
+        // Add noise to the simulation
+        const noiseX = (Math.random() - 0.5) * noiseLevel * 20;
+        const noiseY = (Math.random() - 0.5) * noiseLevel * 20;
+        const noiseZ = (Math.random() - 0.5) * noiseLevel * 20;
+        
+        x += (dx + noiseX) * dt;
+        y += (dy + noiseY) * dt;
+        z += (dz + noiseZ) * dt;
+        
+        // Add noisy measurements for visualization
+        const noisyX = x + (Math.random() - 0.5) * noiseLevel * 10;
+        const noisyY = y + (Math.random() - 0.5) * noiseLevel * 10;
+        const noisyZ = z + (Math.random() - 0.5) * noiseLevel * 10;
+        
+        data.push({ x: noisyX, y: noisyY, z: noisyZ, step: i });
       }
     } else if (systemType === 'vanderpol') {
       let u = 2, v = 0;
@@ -298,10 +521,19 @@ public:
         const du = v;
         const dv = mu * (1 - u * u) * v - u;
         
-        u += du * dt;
-        v += dv * dt;
+        X.push([u, v]);
+        Xdot.push([du, dv]);
         
-        data.push({ x: u, y: v, step: i });
+        const noiseU = (Math.random() - 0.5) * noiseLevel * 5;
+        const noiseV = (Math.random() - 0.5) * noiseLevel * 5;
+        
+        u += (du + noiseU) * dt;
+        v += (dv + noiseV) * dt;
+        
+        const noisyU = u + (Math.random() - 0.5) * noiseLevel * 3;
+        const noisyV = v + (Math.random() - 0.5) * noiseLevel * 3;
+        
+        data.push({ x: noisyU, y: noisyV, step: i });
       }
     } else if (systemType === 'duffing') {
       let x = 1, y = 0;
@@ -312,10 +544,19 @@ public:
         const dx = y;
         const dy = -alpha * x - beta * x * x * x + gamma * Math.cos(omega * t);
         
-        x += dx * dt;
-        y += dy * dt;
+        X.push([x, y]);
+        Xdot.push([dx, dy]);
         
-        data.push({ x, y, step: i });
+        const noiseX = (Math.random() - 0.5) * noiseLevel * 3;
+        const noiseY = (Math.random() - 0.5) * noiseLevel * 3;
+        
+        x += (dx + noiseX) * dt;
+        y += (dy + noiseY) * dt;
+        
+        const noisyX = x + (Math.random() - 0.5) * noiseLevel * 2;
+        const noisyY = y + (Math.random() - 0.5) * noiseLevel * 2;
+        
+        data.push({ x: noisyX, y: noisyY, step: i });
       }
     } else if (systemType === 'lotka') {
       let x = 10, y = 5;
@@ -325,15 +566,27 @@ public:
         const dx = alpha * x - beta * x * y;
         const dy = delta * x * y - gamma * y;
         
-        x += dx * dt;
-        y += dy * dt;
+        X.push([x, y]);
+        Xdot.push([dx, dy]);
         
-        data.push({ x, y, step: i });
+        const noiseX = (Math.random() - 0.5) * noiseLevel * 2;
+        const noiseY = (Math.random() - 0.5) * noiseLevel * 2;
+        
+        x += (dx + noiseX) * dt;
+        y += (dy + noiseY) * dt;
+        
+        const noisyX = x + (Math.random() - 0.5) * noiseLevel * 1;
+        const noisyY = y + (Math.random() - 0.5) * noiseLevel * 1;
+        
+        data.push({ x: noisyX, y: noisyY, step: i });
       }
     }
     
+    // Store the data for SINDy analysis
+    setSindyData({ X, Xdot, equations: [], step: 0 });
+    
     return data;
-  }, []);
+  }, [noiseLevel]);
 
   // Improved reset function
   const resetDemo = useCallback(() => {
@@ -451,9 +704,27 @@ public:
       ctx.shadowBlur = 0;
     }
     
-    setCurrentStep(prev => prev + 2);
+    // Run SINDy analysis every 15 steps (but only if we have enough data)
+    if (currentStep % 15 === 0 && currentStep >= 30) {
+      const dataUpToNow = sindyData.X.slice(0, currentStep);
+      const derivativesUpToNow = sindyData.Xdot.slice(0, currentStep);
+      
+      if (dataUpToNow.length >= 25) {
+        const equations = runSINDyAnalysis(dataUpToNow, derivativesUpToNow, selectedDemo, threshold);
+        setSindyData(prev => ({ ...prev, equations, step: currentStep }));
+        setDiscoveredEquations({ clean: equations, noisy: [] });
+      }
+    }
+    
+    setCurrentStep(prev => prev + 1);
     animationRef.current = requestAnimationFrame(animate);
-  }, [isRunning, currentStep, animationData, selectedDemo]);
+  }, [isRunning, currentStep, animationData, selectedDemo, sindyData, threshold, runSINDyAnalysis]);
+
+  // Effect to update equations when parameters change
+  useEffect(() => {
+    // No need to update equations manually anymore since they're computed in real-time
+    setDiscoveredEquations({ clean: [], noisy: [] });
+  }, [selectedDemo, noiseLevel, threshold]);
 
   // Effect to start animation
   useEffect(() => {
@@ -481,7 +752,71 @@ public:
     setAnimationData(data);
     setCurrentStep(0);
     setIsRunning(true);
+    
+    // Clear equations at start
+    setDiscoveredEquations({ clean: [], noisy: [] });
   }, [selectedDemo, generateDemoData, resetDemo, isRunning]);
+
+  // Simple syntax highlighting function
+  const highlightCode = (code: string, language: string): JSX.Element => {
+    const lines = code.split('\n');
+    
+    const highlightLine = (line: string, lang: string): JSX.Element => {
+      if (lang === 'python') {
+        // Python highlighting
+        let highlightedLine = line
+          .replace(/(#.*$)/gm, '<span class="text-green-400">$1</span>') // Comments
+          .replace(/\b(import|from|as|def|class|if|else|elif|for|while|return|yield|try|except|finally|with|lambda|and|or|not|in|is|True|False|None)\b/g, '<span class="text-purple-400">$1</span>') // Keywords
+          .replace(/\b(print|len|range|enumerate|zip|list|dict|set|tuple|str|int|float|bool)\b/g, '<span class="text-blue-400">$1</span>') // Built-ins
+          .replace(/(['"`])([^'"`]*)\1/g, '<span class="text-yellow-300">$1$2$1</span>') // Strings
+          .replace(/\b(\d+\.?\d*)\b/g, '<span class="text-orange-400">$1</span>'); // Numbers
+        
+        return <span dangerouslySetInnerHTML={{ __html: highlightedLine }} />;
+      } else if (lang === 'matlab') {
+        // MATLAB highlighting
+        let highlightedLine = line
+          .replace(/(%.*$)/gm, '<span class="text-green-400">$1</span>') // Comments
+          .replace(/\b(function|end|if|else|elseif|for|while|switch|case|otherwise|try|catch|return|break|continue)\b/g, '<span class="text-purple-400">$1</span>') // Keywords
+          .replace(/\b(plot|figure|xlabel|ylabel|title|legend|hold|on|off|grid|axis|subplot|linspace|zeros|ones|eye|size|length|find|max|min|mean|std|sum|prod|sort)\b/g, '<span class="text-blue-400">$1</span>') // Built-ins
+          .replace(/(['"`])([^'"`]*)\1/g, '<span class="text-yellow-300">$1$2$1</span>') // Strings
+          .replace(/\b(\d+\.?\d*)\b/g, '<span class="text-orange-400">$1</span>'); // Numbers
+        
+        return <span dangerouslySetInnerHTML={{ __html: highlightedLine }} />;
+      } else if (lang === 'julia') {
+        // Julia highlighting
+        let highlightedLine = line
+          .replace(/(#.*$)/gm, '<span class="text-green-400">$1</span>') // Comments
+          .replace(/\b(using|import|export|function|end|if|else|elseif|for|while|try|catch|finally|return|break|continue|macro|struct|mutable|abstract|primitive|type|const|global|local|let|begin|do|quote)\b/g, '<span class="text-purple-400">$1</span>') // Keywords
+          .replace(/\b(println|print|length|size|push!|pop!|append!|zeros|ones|rand|randn|Array|Vector|Matrix|Dict|Set|Tuple|String|Int|Float64|Bool)\b/g, '<span class="text-blue-400">$1</span>') // Built-ins
+          .replace(/(['"`])([^'"`]*)\1/g, '<span class="text-yellow-300">$1$2$1</span>') // Strings
+          .replace(/\b(\d+\.?\d*)\b/g, '<span class="text-orange-400">$1</span>'); // Numbers
+        
+        return <span dangerouslySetInnerHTML={{ __html: highlightedLine }} />;
+      } else if (lang === 'cpp') {
+        // C++ highlighting
+        let highlightedLine = line
+          .replace(/(\/\/.*$|\/\*[\s\S]*?\*\/)/gm, '<span class="text-green-400">$1</span>') // Comments
+          .replace(/\b(#include|#define|#ifdef|#ifndef|#endif|#if|#else|class|struct|public|private|protected|virtual|static|const|inline|template|typename|namespace|using|int|double|float|char|bool|void|auto|return|if|else|for|while|do|switch|case|default|break|continue|try|catch|throw|new|delete)\b/g, '<span class="text-purple-400">$1</span>') // Keywords
+          .replace(/\b(std|cout|cin|endl|vector|string|map|set|list|queue|stack|pair|make_pair|size|empty|push_back|pop_back|begin|end|insert|erase|find)\b/g, '<span class="text-blue-400">$1</span>') // STL
+          .replace(/(['"`])([^'"`]*)\1/g, '<span class="text-yellow-300">$1$2$1</span>') // Strings
+          .replace(/\b(\d+\.?\d*f?)\b/g, '<span class="text-orange-400">$1</span>'); // Numbers
+        
+        return <span dangerouslySetInnerHTML={{ __html: highlightedLine }} />;
+      }
+      
+      return <span>{line}</span>;
+    };
+    
+    return (
+      <div>
+        {lines.map((line, index) => (
+          <div key={index}>
+            {highlightLine(line, language)}
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   // Copy code functionality
   const copyCode = async (codeKey: string) => {
@@ -545,8 +880,8 @@ public:
         {/* Main Content */}
         <main className="flex-1 p-8 max-w-none">
           <div className="max-w-7xl mx-auto space-y-20">
-          {/* Hero Section with Visual Figures */}
-          <section id="overview" className="space-y-8">
+            {/* Hero Section with Visual Figures */}
+            <section id="overview" className="space-y-8">
             <div className="text-center space-y-6">
               <div className="inline-flex items-center space-x-2 bg-slate-100/80 text-slate-700 px-4 py-2 rounded-full text-sm font-medium">
                 <Star className="w-4 h-4" />
@@ -561,56 +896,26 @@ public:
               </p>
             </div>
 
-            {/* Visual Figures from Research Papers */}
-            <div className="grid lg:grid-cols-3 gap-8">
-              {/* Lorenz Attractor Visualization */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50 hover:shadow-lg transition-shadow">
-                <div className="aspect-square bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-lg mb-4 flex items-center justify-center relative overflow-hidden">
-                  <svg viewBox="0 0 200 200" className="w-full h-full">
-                    <path d="M100,20 Q140,60 120,100 Q80,140 100,180 Q160,160 140,120 Q120,80 100,20" 
-                          fill="none" stroke="#3b82f6" strokeWidth="2" opacity="0.8"/>
-                    <path d="M80,40 Q60,80 80,120 Q120,100 100,140 Q60,120 80,80 Q100,60 80,40" 
-                          fill="none" stroke="#ef4444" strokeWidth="2" opacity="0.6"/>
-                    <circle cx="100" cy="100" r="3" fill="#ef4444"/>
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">Chaotic Dynamics</h3>
-                <p className="text-slate-600 text-sm">Discover complex nonlinear systems like the Lorenz attractor from time-series data.</p>
+            {/* SINDy Methodology Figure */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-slate-200/50 shadow-lg">
+              <h2 className="text-2xl font-semibold text-slate-900 text-center mb-8">SINDy Methodology Overview</h2>
+              
+              <div className="flex justify-center">
+                <img 
+                  src="/sindy-methodology-figure.jpeg" 
+                  alt="SINDy Methodology: From Lorenz System Data to Sparse Identification" 
+                  className="max-w-full h-auto rounded-lg shadow-md border border-slate-200"
+                  style={{ maxHeight: '600px' }}
+                />
               </div>
-
-              {/* Sparse Regression Visualization */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50 hover:shadow-lg transition-shadow">
-                <div className="aspect-square bg-gradient-to-br from-green-500/10 to-blue-500/10 rounded-lg mb-4 flex items-center justify-center">
-                  <div className="grid grid-cols-8 gap-1 p-4">
-                    {Array.from({length: 64}, (_, i) => (
-                      <div key={i} className={`w-2 h-2 rounded-sm ${
-                        [5, 12, 19, 28, 35, 44, 51, 60].includes(i) 
-                          ? 'bg-green-500' 
-                          : 'bg-slate-200'
-                      }`} />
-                    ))}
-                  </div>
-                </div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">Sparse Discovery</h3>
-                <p className="text-slate-600 text-sm">Identify the minimal set of terms needed to describe system dynamics.</p>
-              </div>
-
-              {/* Equation Discovery Visualization */}
-              <div className="bg-white/70 backdrop-blur-sm rounded-xl p-6 border border-slate-200/50 hover:shadow-lg transition-shadow">
-                <div className="aspect-square bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-lg mb-4 flex items-center justify-center">
-                  <div className="text-center space-y-2">
-                    <div className="text-slate-700 font-mono text-xs">dx/dt = σ(y - x)</div>
-                    <div className="text-slate-700 font-mono text-xs">dy/dt = x(ρ - z) - y</div>
-                    <div className="text-slate-700 font-mono text-xs">dz/dt = xy - βz</div>
-                    <div className="flex justify-center space-x-1 mt-3">
-                      <div className="w-1 h-1 bg-purple-500 rounded-full animate-pulse"></div>
-                      <div className="w-1 h-1 bg-purple-500 rounded-full animate-pulse"></div>
-                      <div className="w-1 h-1 bg-purple-500 rounded-full animate-pulse"></div>
-                    </div>
-                  </div>
-                </div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">Interpretable Results</h3>
-                <p className="text-slate-600 text-sm">Generate clean mathematical equations that scientists can interpret.</p>
+              
+              <div className="mt-6 text-center">
+                <p className="text-sm text-slate-600 max-w-4xl mx-auto leading-relaxed">
+                  <strong>Figure:</strong> The SINDy algorithm discovers governing equations from data. 
+                  Starting with time-series measurements (left), a library of candidate functions is constructed (center), 
+                  and sparse regression identifies the active terms to reveal the underlying dynamics (right). 
+                  The sparse coefficient matrix Ξ contains mostly zeros, with only the essential terms for the Lorenz system remaining.
+                </p>
               </div>
             </div>
           </section>
@@ -685,55 +990,135 @@ public:
                       </div>
                     )}
                   </div>
+
+                  {/* Parameter Controls */}
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-slate-900">SINDy Parameters</h4>
+                    <div className="space-y-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-sm font-medium text-slate-700">Noise Level</label>
+                          <span className="text-xs text-slate-500 bg-white px-2 py-1 rounded">{noiseLevel.toFixed(3)}</span>
+                        </div>
+                        <input 
+                          type="range" 
+                          min="0" 
+                          max="0.5" 
+                          step="0.01" 
+                          value={noiseLevel}
+                          onChange={(e) => setNoiseLevel(parseFloat(e.target.value))}
+                          className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer slider"
+                        />
+                        <div className="flex justify-between text-xs text-slate-500">
+                          <span>Clean</span>
+                          <span>Very Noisy</span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-sm font-medium text-slate-700">Sparsity Threshold</label>
+                          <span className="text-xs text-slate-500 bg-white px-2 py-1 rounded">{threshold.toFixed(3)}</span>
+                        </div>
+                        <input 
+                          type="range" 
+                          min="0.001" 
+                          max="1.0" 
+                          step="0.01" 
+                          value={threshold}
+                          onChange={(e) => setThreshold(parseFloat(e.target.value))}
+                          className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer slider"
+                        />
+                        <div className="flex justify-between text-xs text-slate-500">
+                          <span>Very Sparse</span>
+                          <span>Less Sparse</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-4">
-                  <h4 className="font-semibold text-slate-900">Discovered Equations</h4>
-                  <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
-                    <div className="font-mono text-sm space-y-1 text-slate-700">
-                      {selectedDemo === 'lorenz' && (
-                        <>
-                          <div>dx/dt = -10.000 x + 10.000 y</div>
-                          <div>dy/dt = 27.994 x - 0.999 y - 1.000 x z</div>
-                          <div>dz/dt = -2.666 z + 1.000 x y</div>
-                        </>
-                      )}
-                      {selectedDemo === 'vanderpol' && (
-                        <>
-                          <div>dx/dt = y</div>
-                          <div>dy/dt = -x + μ(1 - x²)y</div>
-                        </>
-                      )}
-                      {selectedDemo === 'duffing' && (
-                        <>
-                          <div>dx/dt = y</div>
-                          <div>dy/dt = -x - x³ + F cos(ωt)</div>
-                        </>
-                      )}
-                      {selectedDemo === 'lotka' && (
-                        <>
-                          <div>dx/dt = αx - βxy</div>
-                          <div>dy/dt = δxy - γy</div>
-                        </>
+                  <h4 className="font-semibold text-slate-900">Real-Time SINDy Discovery</h4>
+                  
+                  {/* Current Discovered Equations */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      <h5 className="font-medium text-blue-800">
+                        {isRunning ? `Discovering... (Step ${currentStep}/${animationData.length})` : 'Current Model'}
+                      </h5>
+                    </div>
+                    <div className="font-mono text-sm space-y-1 text-blue-900 bg-white/50 p-3 rounded border max-h-32 overflow-y-auto">
+                      {discoveredEquations.clean.length > 0 ? (
+                        discoveredEquations.clean.map((eq, index) => (
+                          <div key={index} className="break-all">{eq}</div>
+                        ))
+                      ) : (
+                        <div className="text-blue-600 italic">
+                          {isRunning ? 'Collecting data...' : 'Click "Run" to discover equations...'}
+                        </div>
                       )}
                     </div>
+                    <p className="text-xs text-blue-700 mt-2">
+                      {isRunning ? 
+                        `SINDy updates every 15 steps. Current data points: ${Math.min(currentStep, sindyData.X.length)}` :
+                        'Equations discovered using sparse regression'
+                      }
+                    </p>
                   </div>
-                  
-                  <div className="space-y-3">
-                    <h4 className="font-semibold text-slate-900">Parameters</h4>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <label className="text-sm text-slate-600">Noise Level</label>
-                        <div className="flex items-center gap-2">
-                          <input type="range" min="0" max="0.1" step="0.01" defaultValue="0.02" className="w-20" />
-                          <span className="text-xs text-slate-500 w-8">0.02</span>
+
+                  {/* Progress Indicator */}
+                  {isRunning && (
+                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-slate-700">Discovery Progress</span>
+                        <span className="text-xs text-slate-500">
+                          {Math.round((currentStep / animationData.length) * 100)}%
+                        </span>
+                      </div>
+                      <div className="w-full bg-slate-200 rounded-full h-2">
+                        <div 
+                          className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${Math.min(100, (currentStep / animationData.length) * 100)}%` }}
+                        ></div>
+                      </div>
+                      <div className="mt-2 text-xs text-slate-600">
+                        Next SINDy update in {15 - (currentStep % 15)} steps
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Quality Metrics */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                    <h5 className="font-medium text-slate-800 mb-3">Model Parameters</h5>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-slate-600">Data Points:</span>
+                          <span className="font-mono text-slate-900">
+                            {Math.min(currentStep, sindyData.X.length)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-600">Threshold:</span>
+                          <span className="font-mono text-slate-900">
+                            {threshold.toFixed(3)}
+                          </span>
                         </div>
                       </div>
-                      <div className="flex items-center justify-between">
-                        <label className="text-sm text-slate-600">Threshold</label>
-                        <div className="flex items-center gap-2">
-                          <input type="range" min="0" max="1" step="0.1" defaultValue="0.1" className="w-20" />
-                          <span className="text-xs text-slate-500 w-8">0.1</span>
+                      <div className="space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-slate-600">Noise Level:</span>
+                          <span className="font-mono text-slate-900">
+                            {noiseLevel.toFixed(3)}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-slate-600">Last Update:</span>
+                          <span className="font-mono text-slate-900">
+                            Step {sindyData.step}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -750,9 +1135,9 @@ public:
                 <Youtube className="h-4 w-4" />
                 Essential Tutorial Series
               </div>
-              <h2 className="text-4xl font-bold text-slate-900">Master SINDy with Steve Brunton</h2>
+              <h2 className="text-4xl font-bold text-slate-900">Learn SINDy with Steve Brunton</h2>
               <p className="text-xl text-slate-600 max-w-4xl mx-auto leading-relaxed">
-                Learn SINDy from the creator himself with this comprehensive 4-part tutorial series covering theory, implementation, and applications.
+                Learn SINDy from the with this comprehensive 4-part tutorial series covering theory, implementation, and applications.
               </p>
             </div>
             
@@ -966,7 +1351,9 @@ public:
                   </div>
                   
                   <pre className="text-sm text-slate-300 overflow-x-auto p-6 bg-slate-900 font-mono leading-relaxed max-h-96">
-                    <code>{codeExamples[selectedLanguage as keyof typeof codeExamples]}</code>
+                    <code>
+                      {highlightCode(codeExamples[selectedLanguage as keyof typeof codeExamples], selectedLanguage)}
+                    </code>
                   </pre>
                 </div>
               </div>
@@ -1073,6 +1460,7 @@ public:
             <div className="grid md:grid-cols-2 gap-6">
               {[
                 {
+                  id: 'brunton2016',
                   title: "Discovering governing equations from data",
                   authors: "Brunton, S. L., Proctor, J. L., & Kutz, J. N.",
                   journal: "Proceedings of National Academy of Sciences",
@@ -1081,9 +1469,20 @@ public:
                   description: "The original SINDy paper that introduced sparse identification of nonlinear dynamical systems.",
                   color: "slate",
                   type: "Original Paper",
-                  url: "https://www.pnas.org/doi/10.1073/pnas.1517384113"
+                  url: "https://www.pnas.org/doi/10.1073/pnas.1517384113",
+                  bibtex: `@article{brunton2016discovering,
+  title={Discovering governing equations from data by sparse identification of nonlinear dynamical systems},
+  author={Brunton, Steven L and Proctor, Joshua L and Kutz, J Nathan},
+  journal={Proceedings of the national academy of sciences},
+  volume={113},
+  number={15},
+  pages={3932--3937},
+  year={2016},
+  publisher={National Acad Sciences}
+}`
                 },
                 {
+                  id: 'brunton2016control',
                   title: "Sparse identification with control (SINDYc)",
                   authors: "Brunton, S. L., Proctor, J. L., & Kutz, J. N.",
                   journal: "IFAC-PapersOnLine",
@@ -1092,9 +1491,20 @@ public:
                   description: "Extension of SINDy for systems with control inputs and external forcing.",
                   color: "green",
                   type: "Extension",
-                  url: "https://www.sciencedirect.com/science/article/pii/S2405896316318298"
+                  url: "https://www.sciencedirect.com/science/article/pii/S2405896316318298",
+                  bibtex: `@article{brunton2016sparse,
+  title={Sparse identification of nonlinear dynamics with control (SINDYc)},
+  author={Brunton, Steven L and Proctor, Joshua L and Kutz, J Nathan},
+  journal={IFAC-PapersOnLine},
+  volume={49},
+  number={18},
+  pages={710--715},
+  year={2016},
+  publisher={Elsevier}
+}`
                 },
                 {
+                  id: 'messenger2021weak',
                   title: "Weak SINDy for partial differential equations",
                   authors: "Messenger, D. A., & Bortz, D. M.",
                   journal: "Journal of Computational Physics",
@@ -1103,9 +1513,19 @@ public:
                   description: "Novel approach for discovering PDEs using weak formulations and integration by parts.",
                   color: "purple",
                   type: "PDE Extension",
-                  url: "https://www.sciencedirect.com/science/article/pii/S0021999121004204"
+                  url: "https://www.sciencedirect.com/science/article/pii/S0021999121004204",
+                  bibtex: `@article{messenger2021weak,
+  title={Weak SINDy: Galerkin-based data-driven model selection},
+  author={Messenger, Daniel A and Bortz, David M},
+  journal={Journal of Computational Physics},
+  volume={443},
+  pages={110520},
+  year={2021},
+  publisher={Elsevier}
+}`
                 },
                 {
+                  id: 'champion2019unified',
                   title: "A unified sparse optimization framework",
                   authors: "Champion, K., Zheng, P., Aravkin, A. Y., et al.",
                   journal: "Nature Communications", 
@@ -1114,55 +1534,96 @@ public:
                   description: "Comprehensive framework combining deep learning with sparse optimization for system discovery.",
                   color: "orange",
                   type: "Deep Learning",
-                  url: "https://arxiv.org/abs/1906.10612"
+                  url: "https://arxiv.org/abs/1906.10612",
+                  bibtex: `@article{champion2019unified,
+  title={A unified sparse optimization framework to learn parsimonious physics-informed models from data},
+  author={Champion, Kathleen and Zheng, Peng and Aravkin, Aleksandr Y and Brunton, Steven L and Kutz, J Nathan},
+  journal={IEEE Access},
+  volume={8},
+  pages={169259--169271},
+  year={2020},
+  publisher={IEEE}
+}`
                 }
-              ].map((paper, index) => (
-                <div key={index} className="bg-white/70 backdrop-blur-sm rounded-xl border border-slate-200/50 hover:shadow-lg transition-shadow group">
-                  <div className="p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        paper.color === 'slate' ? 'bg-slate-100 text-slate-800' :
-                        paper.color === 'green' ? 'bg-green-100 text-green-800' :
-                        paper.color === 'purple' ? 'bg-purple-100 text-purple-800' :
-                        'bg-orange-100 text-orange-800'
-                      }`}>
-                        {paper.type}
-                      </span>
-                      <span className="text-slate-500 text-sm">{paper.year}</span>
-                    </div>
-                    
-                    <h3 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-slate-700 transition-colors leading-tight">
-                      {paper.title}
-                    </h3>
-                    
-                    <p className="text-slate-600 text-sm mb-2 leading-relaxed">{paper.authors}</p>
-                    <p className="text-slate-500 text-sm mb-4 italic">{paper.journal}</p>
-                    
-                    <p className="text-slate-700 mb-4 leading-relaxed text-sm">{paper.description}</p>
-                    
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-slate-500 flex items-center gap-1">
-                        <BarChart3 className="w-4 h-4" />
-                        {paper.citations} citations
-                      </span>
-                      <a 
-                        href={paper.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`font-medium flex items-center gap-2 group-hover:gap-3 transition-all text-sm ${
-                          paper.color === 'slate' ? 'text-slate-700 hover:text-slate-800' :
-                          paper.color === 'green' ? 'text-green-600 hover:text-green-700' :
-                          paper.color === 'purple' ? 'text-purple-600 hover:text-purple-700' :
-                          'text-orange-600 hover:text-orange-700'
-                        }`}
-                      >
-                        Read Paper 
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
+              ].map((paper, index) => {
+                const copyBibtex = async (paperId: string, bibtex: string) => {
+                  try {
+                    await navigator.clipboard.writeText(bibtex);
+                    setCopiedBibtex(prev => ({ ...prev, [paperId]: true }));
+                    setTimeout(() => {
+                      setCopiedBibtex(prev => ({ ...prev, [paperId]: false }));
+                    }, 2000);
+                  } catch (err) {
+                    console.error('Failed to copy bibtex:', err);
+                  }
+                };
+
+                return (
+                  <div key={index} className="bg-white/70 backdrop-blur-sm rounded-xl border border-slate-200/50 hover:shadow-lg transition-shadow group">
+                    <div className="p-6">
+                      <div className="flex items-start justify-between mb-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          paper.color === 'slate' ? 'bg-slate-100 text-slate-800' :
+                          paper.color === 'green' ? 'bg-green-100 text-green-800' :
+                          paper.color === 'purple' ? 'bg-purple-100 text-purple-800' :
+                          'bg-orange-100 text-orange-800'
+                        }`}>
+                          {paper.type}
+                        </span>
+                        <span className="text-slate-500 text-sm">{paper.year}</span>
+                      </div>
+                      
+                      <h3 className="text-lg font-bold text-slate-900 mb-3 group-hover:text-slate-700 transition-colors leading-tight">
+                        {paper.title}
+                      </h3>
+                      
+                      <p className="text-slate-600 text-sm mb-2 leading-relaxed">{paper.authors}</p>
+                      <p className="text-slate-500 text-sm mb-4 italic">{paper.journal}</p>
+                      
+                      <p className="text-slate-700 mb-4 leading-relaxed text-sm">{paper.description}</p>
+                      
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-slate-500 flex items-center gap-1">
+                          <BarChart3 className="w-4 h-4" />
+                          {paper.citations} citations
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => copyBibtex(paper.id, paper.bibtex)}
+                            className="px-2 py-1 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 rounded transition-colors flex items-center gap-1"
+                          >
+                            {copiedBibtex[paper.id] ? (
+                              <>
+                                <Check className="w-3 h-3" />
+                                Copied
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3 h-3" />
+                                BibTeX
+                              </>
+                            )}
+                          </button>
+                          <a 
+                            href={paper.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`font-medium flex items-center gap-2 group-hover:gap-3 transition-all text-sm ${
+                              paper.color === 'slate' ? 'text-slate-700 hover:text-slate-800' :
+                              paper.color === 'green' ? 'text-green-600 hover:text-green-700' :
+                              paper.color === 'purple' ? 'text-purple-600 hover:text-purple-700' :
+                              'text-orange-600 hover:text-orange-700'
+                            }`}
+                          >
+                            Read Paper 
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
 
@@ -1283,7 +1744,7 @@ public:
                 </div>
               </div>
             </div>
-
+            
             {/* Contact Card */}
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-slate-900">Contact</h3>
@@ -1300,7 +1761,7 @@ public:
                       <div>
                         <h4 className="text-lg font-bold text-slate-900">Professor Steve Brunton</h4>
                         <p className="text-slate-600 text-sm mb-1">University of Washington</p>
-                        <p className="text-slate-500 text-xs">Questions about SINDy theory and methodology</p>
+                        <p className="text-slate-500 text-xs">Creator of SINDy</p>
                       </div>
                       
                       {/* Contact Links */}
@@ -1317,7 +1778,7 @@ public:
                         </a>
                         
                         <a 
-                          href="https://github.com" 
+                          href="https://github.com/dynamicslab" 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
@@ -1330,7 +1791,7 @@ public:
                   </div>
                 </div>
               </div>
-            </div>            
+            </div>
 
             {/* Community Links */}
             <div className="bg-white/70 backdrop-blur-sm rounded-xl p-8 border border-slate-200/50">
@@ -1343,14 +1804,14 @@ public:
                     <div className="text-sm text-slate-600">Source code and issues</div>
                   </div>
                 </a>
-                <a href="mailto:contact@sindy.org" className="flex items-center space-x-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors group">
+                <a href="mailto:sbrunton@uw.edu" className="flex items-center space-x-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors group">
                   <Users className="w-5 h-5 text-slate-600 group-hover:text-slate-900" />
                   <div>
                     <div className="font-medium text-slate-900">Submit Example</div>
                     <div className="text-sm text-slate-600">Share your research</div>
                   </div>
                 </a>
-                <a href="#community" className="flex items-center space-x-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors group">
+                <a href="https://pysindy.readthedocs.io/" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-3 p-4 bg-slate-50 hover:bg-slate-100 rounded-lg transition-colors group">
                   <Book className="w-5 h-5 text-slate-600 group-hover:text-slate-900" />
                   <div>
                     <div className="font-medium text-slate-900">Documentation</div>
@@ -1360,8 +1821,8 @@ public:
               </div>
             </div>
           </section>
-
-          </div>
+          
+        </div>
         </main>
       </div>
 

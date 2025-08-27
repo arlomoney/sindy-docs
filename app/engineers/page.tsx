@@ -917,7 +917,7 @@ Xi = optimizer.fit(Theta, x_dot).coef_`
                         <a 
                           href="mailto:u.fasel@lse.ac.uk" 
                           className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center justify-center transition-colors group"
-                          title="Email Professor Brunton"
+                          title="Email Professor Urban Fasel"
                         >
                           <svg className="w-4 h-4 text-slate-600 group-hover:text-slate-800" fill="currentColor" viewBox="0 0 20 20">
                             <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
