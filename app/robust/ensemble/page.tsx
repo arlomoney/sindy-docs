@@ -62,8 +62,21 @@ export default function EnsembleSINDyPage() {
       </header>
 
       <div className="flex max-w-7xl mx-auto">
+
         {/* Sidebar Navigation */}
-        <Navbar currentPage="ensemble-sindy" />
+<Navbar 
+  currentPage="ensemble-sindy" 
+  sections={[
+    { id: 'overview', label: 'Overview', href: '#overview' },
+    { id: 'methodology', label: 'Methodology', href: '#methodology' },
+    { id: 'installation', label: 'Installation', href: '#installation' },
+    { id: 'examples', label: 'Code Examples', href: '#examples' },
+    { id: 'advanced', label: 'Advanced Features', href: '#advanced' },
+    { id: 'results', label: 'Results & Visualization', href: '#results' },
+    { id: 'publications', label: 'Publications', href: '#publications' },
+    { id: 'contact', label: 'Contact', href: '#contact' }
+  ]}
+/>
 
         {/* Main Content */}
         <main className="flex-1 p-8 space-y-16">

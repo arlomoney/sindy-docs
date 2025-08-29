@@ -162,8 +162,18 @@ Xi = optimizer.fit(Theta, x_dot).coef_`
 
       <div className="flex max-w-7xl mx-auto">
         {/* Sidebar Navigation */}
-        <Navbar currentPage="engineers" />
-
+<Navbar 
+  currentPage="engineers" 
+  sections={[
+    { id: 'overview', label: 'Overview', href: '#overview' },
+    { id: 'fundamentals', label: 'SINDy Fundamentals', href: '#fundamentals' },
+    { id: 'tutorials', label: 'Learning Modules', href: '#tutorials' },
+    { id: 'examples', label: 'Practical Examples', href: '#examples' },
+    { id: 'challenges', label: 'Challenges & Solutions', href: '#challenges' },
+    { id: 'getting-started', label: 'Getting Started', href: '#getting-started' },
+    { id: 'contact', label: 'Contact', href: '#contact' }
+  ]}
+/>
         {/* Main Content */}
         <main className="flex-1 p-8 space-y-16">
           {/* Hero Section */}
@@ -572,23 +582,23 @@ Xi = optimizer.fit(Theta, x_dot).coef_`
 
                     <div className="space-y-4">
                       <h4 className="font-semibold text-slate-900">Training Strategies</h4>
-                      <div className="space-y-3 text-sm">
+                      <div className="space-y-3 text-sm text-slate-900">
                         <div className="flex items-start gap-2">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5"></div>
+                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5 text-slate-900"></div>
                           <div>
-                            <span className="font-medium">Schroeder Sweep:</span> Phase-shifted sum of sines for system excitation
+                            <span className="font-medium text-slate-900">Schroeder Sweep:</span> Phase-shifted sum of sines for system excitation
                           </div>
                         </div>
                         <div className="flex items-start gap-2">
                           <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5"></div>
                           <div>
-                            <span className="font-medium">Chirp Signals:</span> Frequency increase with time for broad spectrum coverage
+                            <span className="font-medium text-slate-900">Chirp Signals:</span> Frequency increase with time for broad spectrum coverage
                           </div>
                         </div>
                         <div className="flex items-start gap-2">
                           <div className="w-2 h-2 bg-blue-500 rounded-full mt-1.5"></div>
                           <div>
-                            <span className="font-medium">Safe Excitation:</span> Maximize information gain while respecting constraints
+                            <span className="font-medium text-slate-900">Safe Excitation:</span> Maximize information gain while respecting constraints
                           </div>
                         </div>
                       </div>

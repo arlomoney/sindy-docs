@@ -404,8 +404,9 @@ export default function ResearchPage() {
 
       <div className="flex max-w-7xl mx-auto">
         {/* Sidebar Navigation */}
-        <Navbar currentPage="research" />
-
+<Navbar 
+  currentPage="research" 
+/>
         {/* Main Content */}
         <main className="flex-1 p-8 space-y-12">
           {/* Hero Section */}

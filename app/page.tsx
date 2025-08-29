@@ -875,7 +875,18 @@ public:
 
       <div className="flex">
         {/* Sidebar Navigation */}
-        <Navbar currentPage="home" />
+        <Navbar 
+  currentPage="home" 
+  sections={[
+    { id: 'overview', label: 'Overview', href: '#overview' },
+    { id: 'demo', label: 'Interactive Demo', href: '#demo' },
+    { id: 'videos', label: 'Video Tutorials', href: '#videos' },
+    { id: 'implementation', label: 'Implementation', href: '#implementation' },
+    { id: 'method', label: 'What is SINDy', href: '#method' },
+    { id: 'papers', label: 'Research Papers', href: '#papers' },
+    { id: 'community', label: 'Community', href: '#community' }
+  ]}
+/>
 
         {/* Main Content */}
         <main className="flex-1 p-8 max-w-none">
@@ -1225,7 +1236,7 @@ public:
 
             <div className="text-center">
               <a 
-                href="https://www.youtube.com/@Eigensteve"
+                href="https://www.youtube.com/playlist?list=PLMrJAkhIeNNQ0BaKuBKY43k4xMo6NSbBa"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors group"

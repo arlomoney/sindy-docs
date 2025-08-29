@@ -62,15 +62,21 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/ensemble" className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2">
+                <Link href="/robust/ensemble" className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2">
                   <Code className="w-4 h-4" />
                   Ensemble SINDy
                 </Link>
               </li>
               <li>
-                <Link href="/weak" className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2">
+                <Link href="/robust/weak" className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2">
                   <Code className="w-4 h-4" />
                   Weak SINDy
+                </Link>
+              </li>
+              <li>
+                <Link href="/sindyc" className="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-2">
+                  <Code className="w-4 h-4" />
+                  SINDyC
                 </Link>
               </li>
               <li>
@@ -180,6 +186,9 @@ const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-slate-400 text-sm">
               © 2025 Dynamics Lab. Open source project for advancing dynamical systems discovery.
+            </p>
+            <p className="text-slate-400 text-sm">
+              Built by Arlene Shergill 
             </p>
             <div className="flex space-x-6">
               <Link href="/privacy" className="text-slate-400 hover:text-white transition-colors text-sm">

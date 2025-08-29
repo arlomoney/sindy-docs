@@ -63,7 +63,18 @@ export default function PySINDyPage() {
 
       <div className="flex max-w-7xl mx-auto">
         {/* Sidebar Navigation */}
-        <Navbar currentPage="pysindy" />
+<Navbar 
+  currentPage="pysindy" 
+  sections={[
+    { id: 'overview', label: 'Overview', href: '#overview' },
+    { id: 'installation', label: 'Installation', href: '#installation' },
+    { id: 'quickstart', label: 'Quick Start', href: '#quickstart' },
+    { id: 'tutorials', label: 'Video Tutorials', href: '#tutorials' },
+    { id: 'api', label: 'API Reference', href: '#api' },
+    { id: 'community', label: 'Community', href: '#community' },
+    { id: 'contact', label: 'Contact', href: '#contact' }
+  ]}
+/>
 
         {/* Main Content */}
         <main className="flex-1 p-8 space-y-16">
